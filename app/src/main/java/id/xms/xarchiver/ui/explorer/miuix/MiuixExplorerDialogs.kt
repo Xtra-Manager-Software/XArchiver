@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Label
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.LinearProgressIndicator
@@ -29,6 +30,8 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import id.xms.xarchiver.R
 import id.xms.xarchiver.core.FileItem
+import id.xms.xarchiver.core.humanReadable
+import id.xms.xarchiver.ui.explorer.utils.FileTypeDetector
 import top.yukonga.miuix.kmp.basic.Button
 import top.yukonga.miuix.kmp.basic.ButtonDefaults
 import top.yukonga.miuix.kmp.basic.HorizontalDivider
@@ -37,6 +40,11 @@ import top.yukonga.miuix.kmp.basic.Surface
 import top.yukonga.miuix.kmp.basic.Text
 import top.yukonga.miuix.kmp.theme.MiuixTheme
 import java.io.File
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 @Composable
 fun MiuixTextInputDialog(
@@ -602,5 +610,250 @@ fun MiuixBottomSheetRow(
         Icon(icon, contentDescription = null, tint = MiuixTheme.colorScheme.primary, modifier = Modifier.size(22.dp))
         Spacer(Modifier.width(16.dp))
         Text(label, fontSize = 15.sp, color = textColor)
+    }
+}
+
+@Composable
+fun MiuixPropertiesDialog(
+    filePath: String,
+    isDark: Boolean,
+    cardBg: Color,
+    inputBg: Color,
+    primaryColor: Color,
+    primaryTextColor: Color,
+    secondaryTextColor: Color,
+    onDismiss: () -> Unit
+) {
+    val file = remember { File(filePath) }
+    val dateFormatter = remember { SimpleDateFormat("MMM dd, yyyy HH:mm:ss", Locale.getDefault()) }
+
+    var directorySize by remember { mutableStateOf<Long?>(null) }
+    var fileCount by remember { mutableStateOf(0) }
+    var folderCount by remember { mutableStateOf(0) }
+
+    LaunchedEffect(filePath) {
+        if (file.isDirectory) {
+            withContext(Dispatchers.IO) {
+                var size = 0L
+                var files = 0
+                var folders = 0
+                file.walkTopDown().forEach { f ->
+                    if (f.isFile) {
+                        size += f.length()
+                        files++
+                    } else if (f.isDirectory && f != file) {
+                        folders++
+                    }
+                }
+                directorySize = size
+                fileCount = files
+                folderCount = folders
+            }
+        }
+    }
+
+    Dialog(onDismissRequest = onDismiss) {
+        Surface(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 8.dp)
+                .shadow(16.dp, RoundedCornerShape(24.dp)),
+            color = cardBg,
+            shape = RoundedCornerShape(24.dp)
+        ) {
+            Column(modifier = Modifier.padding(24.dp)) {
+                // Header
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Box(
+                        modifier = Modifier
+                            .size(46.dp)
+                            .clip(RoundedCornerShape(14.dp))
+                            .background(primaryColor.copy(alpha = 0.12f)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = if (file.isDirectory) Icons.Default.Folder else Icons.Default.Description,
+                            contentDescription = null,
+                            tint = primaryColor,
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
+                    Spacer(Modifier.width(14.dp))
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = stringResource(R.string.action_details),
+                            fontSize = 19.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = primaryTextColor
+                        )
+                        Text(
+                            text = file.name,
+                            fontSize = 12.sp,
+                            color = secondaryTextColor,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
+                }
+
+                Spacer(Modifier.height(18.dp))
+
+                // Properties Card
+                Surface(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(16.dp),
+                    color = inputBg
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 14.dp, vertical = 6.dp)
+                    ) {
+                        // Name
+                        MiuixPropertyRow(
+                            icon = Icons.AutoMirrored.Filled.Label,
+                            label = stringResource(R.string.property_name),
+                            value = file.name,
+                            primaryColor = primaryColor,
+                            primaryTextColor = primaryTextColor,
+                            secondaryTextColor = secondaryTextColor
+                        )
+
+                        HorizontalDivider(color = secondaryTextColor.copy(alpha = 0.15f), thickness = 0.5.dp)
+
+                        // Location
+                        MiuixPropertyRow(
+                            icon = Icons.Default.FolderOpen,
+                            label = stringResource(R.string.property_location),
+                            value = file.parent ?: "/",
+                            primaryColor = primaryColor,
+                            primaryTextColor = primaryTextColor,
+                            secondaryTextColor = secondaryTextColor
+                        )
+
+                        HorizontalDivider(color = secondaryTextColor.copy(alpha = 0.15f), thickness = 0.5.dp)
+
+                        // Size
+                        val displaySize = if (file.isDirectory) {
+                            directorySize?.humanReadable() ?: stringResource(R.string.property_calculating)
+                        } else {
+                            file.length().humanReadable()
+                        }
+                        MiuixPropertyRow(
+                            icon = Icons.Default.Storage,
+                            label = stringResource(R.string.property_size),
+                            value = displaySize,
+                            primaryColor = primaryColor,
+                            primaryTextColor = primaryTextColor,
+                            secondaryTextColor = secondaryTextColor
+                        )
+
+                        // Contents for directories
+                        if (file.isDirectory) {
+                            HorizontalDivider(color = secondaryTextColor.copy(alpha = 0.15f), thickness = 0.5.dp)
+                            MiuixPropertyRow(
+                                icon = Icons.Default.Folder,
+                                label = stringResource(R.string.property_contents),
+                                value = stringResource(R.string.property_contents_format, fileCount, folderCount),
+                                primaryColor = primaryColor,
+                                primaryTextColor = primaryTextColor,
+                                secondaryTextColor = secondaryTextColor
+                            )
+                        }
+
+                        HorizontalDivider(color = secondaryTextColor.copy(alpha = 0.15f), thickness = 0.5.dp)
+
+                        // Modified
+                        MiuixPropertyRow(
+                            icon = Icons.Default.Schedule,
+                            label = stringResource(R.string.property_modified),
+                            value = dateFormatter.format(Date(file.lastModified())),
+                            primaryColor = primaryColor,
+                            primaryTextColor = primaryTextColor,
+                            secondaryTextColor = secondaryTextColor
+                        )
+
+                        HorizontalDivider(color = secondaryTextColor.copy(alpha = 0.15f), thickness = 0.5.dp)
+
+                        // Permissions
+                        MiuixPropertyRow(
+                            icon = Icons.Default.Security,
+                            label = stringResource(R.string.property_permissions),
+                            value = FileTypeDetector.formatFilePermissions(file),
+                            primaryColor = primaryColor,
+                            primaryTextColor = primaryTextColor,
+                            secondaryTextColor = secondaryTextColor
+                        )
+
+                        // Type (files only)
+                        if (file.isFile && file.extension.isNotEmpty()) {
+                            HorizontalDivider(color = secondaryTextColor.copy(alpha = 0.15f), thickness = 0.5.dp)
+                            MiuixPropertyRow(
+                                icon = Icons.Default.Extension,
+                                label = stringResource(R.string.property_type),
+                                value = ".${file.extension.uppercase()}",
+                                primaryColor = primaryColor,
+                                primaryTextColor = primaryTextColor,
+                                secondaryTextColor = secondaryTextColor
+                            )
+                        }
+                    }
+                }
+
+                Spacer(Modifier.height(20.dp))
+
+                // Dismiss Button
+                Button(
+                    onClick = onDismiss,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(46.dp),
+                    colors = ButtonDefaults.buttonColorsPrimary()
+                ) {
+                    Text(stringResource(R.string.action_close))
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun MiuixPropertyRow(
+    icon: ImageVector,
+    label: String,
+    value: String,
+    primaryColor: Color,
+    primaryTextColor: Color,
+    secondaryTextColor: Color
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = null,
+            modifier = Modifier.size(20.dp),
+            tint = primaryColor
+        )
+        Spacer(Modifier.width(12.dp))
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = label,
+                fontSize = 11.sp,
+                color = secondaryTextColor
+            )
+            Spacer(Modifier.height(1.dp))
+            Text(
+                text = value,
+                fontSize = 13.sp,
+                fontWeight = FontWeight.Medium,
+                color = primaryTextColor,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis
+            )
+        }
     }
 }

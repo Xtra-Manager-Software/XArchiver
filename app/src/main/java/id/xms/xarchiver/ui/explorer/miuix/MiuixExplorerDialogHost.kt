@@ -12,7 +12,6 @@ import id.xms.xarchiver.core.FileOperationProgress
 import id.xms.xarchiver.core.archive.*
 import id.xms.xarchiver.ui.archive.ArchivePasswordDialog
 import id.xms.xarchiver.ui.archive.CreateArchiveDialog
-import id.xms.xarchiver.ui.components.PropertiesDialog
 import id.xms.xarchiver.ui.explorer.utils.FileTypeDetector
 import java.io.File
 
@@ -136,8 +135,14 @@ fun MiuixExplorerDialogHost(
 
     // 2. File Properties Dialog
     showPropertiesDialog?.let { filePath ->
-        PropertiesDialog(
+        MiuixPropertiesDialog(
             filePath = filePath,
+            isDark = isDark,
+            cardBg = cardBgColor,
+            inputBg = inputBgColor,
+            primaryColor = miuixBlue,
+            primaryTextColor = primaryTextColor,
+            secondaryTextColor = secondaryTextColor,
             onDismiss = onDismissPropertiesDialog
         )
     }

@@ -8,6 +8,7 @@ import androidx.compose.ui.res.stringResource
 import id.xms.xarchiver.R
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Label
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -109,7 +110,7 @@ fun PropertiesDialog(
                 ) {
                     // Name
                     PropertyRow(
-                        icon = Icons.Default.Label,
+                        icon = Icons.AutoMirrored.Filled.Label,
                         label = stringResource(R.string.property_name),
                         value = file.name
                     )
@@ -159,20 +160,10 @@ fun PropertiesDialog(
                     HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f))
                     
                     // Permissions
-                    val readStr = stringResource(R.string.property_read)
-                    val writeStr = stringResource(R.string.property_write)
-                    val execStr = stringResource(R.string.property_execute)
-                    val noneStr = stringResource(R.string.property_none)
-                    val permissions = buildString {
-                        if (file.canRead()) append(readStr)
-                        if (file.canWrite()) append(writeStr)
-                        if (file.canExecute()) append(execStr)
-                    }.trim().ifEmpty { noneStr }
-                    
                     PropertyRow(
                         icon = Icons.Default.Security,
                         label = stringResource(R.string.property_permissions),
-                        value = permissions
+                        value = id.xms.xarchiver.ui.explorer.utils.FileTypeDetector.formatFilePermissions(file)
                     )
                     
                     // File extension (for files only)
