@@ -53,7 +53,7 @@ object ChangelogRepository {
                     titleRes = R.string.changelog_item_2_1_9_home_ui_title,
                     descRes = R.string.changelog_item_2_1_9_home_ui_desc,
                     category = ChangelogCategory.UI,
-                    tags = listOf("Material 3", "Home Screen", "StorageCard", "CategoryGrid", "Quick Access", "Floating Bar")
+                    tags = listOf("Material 3", "Home Screen", "StorageCard", "CategoryGrid", "Bookmarks", "Quick Access", "Floating Bar")
                 ),
                 ChangelogItem(
                     titleRes = R.string.changelog_item_2_1_9_miuix_home_title,

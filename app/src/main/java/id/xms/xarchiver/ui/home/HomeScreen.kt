@@ -29,6 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -42,13 +43,18 @@ import androidx.navigation.NavController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
+import androidx.compose.foundation.lazy.items
 import id.xms.xarchiver.R
+import id.xms.xarchiver.core.Bookmark
+import id.xms.xarchiver.core.BookmarksManager
 import id.xms.xarchiver.core.FileItem
 import id.xms.xarchiver.core.humanReadable
 import id.xms.xarchiver.core.ShareUtils
 import id.xms.xarchiver.ui.theme.*
-import id.xms.xarchiver.ui.theme.*
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 enum class HomeTab {
     Recent, Files
@@ -67,6 +73,11 @@ fun HomeScreen(navController: NavController, viewModel: HomeViewModel = viewMode
         MiuixHomeScreen(navController, viewModel)
         return
     }
+
+    val scope = rememberCoroutineScope()
+    val bookmarksManager = remember { BookmarksManager(context) }
+    val bookmarks by bookmarksManager.bookmarks.collectAsState(initial = emptyList())
+    var showBookmarksSheet by remember { mutableStateOf(false) }
     
     var currentTab by remember { mutableStateOf(HomeTab.Files) }
     
@@ -211,7 +222,7 @@ fun HomeScreen(navController: NavController, viewModel: HomeViewModel = viewMode
                         }
                     }
 
-                    // Quick Categories - Grid layout
+                    // Quick Categories - Grid layout & Bookmarks
                     item(key = "categories") {
                         AnimatedVisibility(
                             visible = showContent,
@@ -222,8 +233,23 @@ fun HomeScreen(navController: NavController, viewModel: HomeViewModel = viewMode
                         ) {
                             CategoriesSection(
                                 categories = viewModel.categories.value,
+                                bookmarksCount = bookmarks.size,
+                                firstBookmarkName = bookmarks.firstOrNull()?.name,
                                 onCategoryClick = { category ->
                                     navController.navigate("category_explorer/${Uri.encode(category.name)}")
+                                },
+                                onBookmarkClick = {
+                                    when {
+                                        bookmarks.isEmpty() -> {
+                                            navController.navigate("explorer/${Uri.encode("/sdcard")}")
+                                        }
+                                        bookmarks.size == 1 -> {
+                                            navController.navigate("explorer/${Uri.encode(bookmarks.first().path)}")
+                                        }
+                                        else -> {
+                                            showBookmarksSheet = true
+                                        }
+                                    }
                                 }
                             )
                         }
@@ -501,6 +527,145 @@ fun HomeScreen(navController: NavController, viewModel: HomeViewModel = viewMode
                 }
             }
         }
+
+        if (showBookmarksSheet && bookmarks.isNotEmpty()) {
+            ModalBottomSheet(
+                onDismissRequest = { showBookmarksSheet = false },
+                containerColor = MaterialTheme.colorScheme.surface,
+                dragHandle = { BottomSheetDefaults.DragHandle() },
+                shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp)
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 20.dp)
+                        .padding(bottom = 32.dp)
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 16.dp)
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(10.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.Bookmark,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.tertiary,
+                                modifier = Modifier.size(24.dp)
+                            )
+                            Text(
+                                text = stringResource(R.string.home_favorites),
+                                style = MaterialTheme.typography.titleLarge,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                        }
+
+                        Surface(
+                            color = MaterialTheme.colorScheme.tertiaryContainer,
+                            shape = CircleShape
+                        ) {
+                            Text(
+                                text = stringResource(R.string.home_favorites_count, bookmarks.size),
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onTertiaryContainer,
+                                fontWeight = FontWeight.SemiBold,
+                                modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
+                            )
+                        }
+                    }
+
+                    LazyColumn(
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        items(bookmarks, key = { it.path }) { bookmark ->
+                            Card(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable {
+                                        showBookmarksSheet = false
+                                        navController.navigate("explorer/${Uri.encode(bookmark.path)}")
+                                    },
+                                colors = CardDefaults.cardColors(
+                                    containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+                                ),
+                                shape = RoundedCornerShape(16.dp)
+                            ) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 14.dp, vertical = 12.dp)
+                                ) {
+                                    Surface(
+                                        color = MaterialTheme.colorScheme.primaryContainer,
+                                        shape = RoundedCornerShape(12.dp),
+                                        modifier = Modifier.size(40.dp)
+                                    ) {
+                                        Box(
+                                            contentAlignment = Alignment.Center,
+                                            modifier = Modifier.fillMaxSize()
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.Filled.Folder,
+                                                contentDescription = null,
+                                                tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                                                modifier = Modifier.size(22.dp)
+                                            )
+                                        }
+                                    }
+
+                                    Spacer(Modifier.width(14.dp))
+
+                                    Column(modifier = Modifier.weight(1f)) {
+                                        Text(
+                                            text = bookmark.name,
+                                            style = MaterialTheme.typography.titleSmall,
+                                            fontWeight = FontWeight.Bold,
+                                            color = MaterialTheme.colorScheme.onSurface,
+                                            maxLines = 1,
+                                            overflow = TextOverflow.Ellipsis
+                                        )
+                                        Spacer(Modifier.height(2.dp))
+                                        Text(
+                                            text = bookmark.path,
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                            maxLines = 1,
+                                            overflow = TextOverflow.Ellipsis
+                                        )
+                                    }
+
+                                    IconButton(
+                                        onClick = {
+                                            scope.launch {
+                                                bookmarksManager.removeBookmark(bookmark.path)
+                                                if (bookmarks.size <= 1) {
+                                                    showBookmarksSheet = false
+                                                }
+                                            }
+                                        }
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Outlined.Delete,
+                                            contentDescription = "Hapus bookmark",
+                                            tint = MaterialTheme.colorScheme.error,
+                                            modifier = Modifier.size(20.dp)
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -678,11 +843,14 @@ private fun StorageSection(
 @Composable
 private fun CategoriesSection(
     categories: List<id.xms.xarchiver.core.Category>,
-    onCategoryClick: (id.xms.xarchiver.core.Category) -> Unit
+    bookmarksCount: Int,
+    firstBookmarkName: String?,
+    onCategoryClick: (id.xms.xarchiver.core.Category) -> Unit,
+    onBookmarkClick: () -> Unit
 ) {
     Column(
         modifier = Modifier.padding(horizontal = 20.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         SectionHeader(
             title = stringResource(R.string.home_categories),
@@ -693,6 +861,130 @@ private fun CategoriesSection(
             categories = categories,
             onCategoryClick = onCategoryClick
         )
+
+        BookmarkLongItem(
+            bookmarksCount = bookmarksCount,
+            firstBookmarkName = firstBookmarkName,
+            onClick = onBookmarkClick
+        )
+    }
+}
+
+@Composable
+private fun BookmarkLongItem(
+    bookmarksCount: Int,
+    firstBookmarkName: String?,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val interactionSource = remember { MutableInteractionSource() }
+    val isPressed by interactionSource.collectIsPressedAsState()
+
+    val scale by animateFloatAsState(
+        targetValue = if (isPressed) 0.98f else 1f,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessMedium
+        ),
+        label = "bookmark_scale"
+    )
+
+    Card(
+        modifier = modifier
+            .fillMaxWidth()
+            .scale(scale)
+            .clickable(
+                interactionSource = interactionSource,
+                indication = null
+            ) { onClick() },
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+        shape = RoundedCornerShape(18.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 14.dp, vertical = 12.dp)
+        ) {
+            Surface(
+                color = MaterialTheme.colorScheme.tertiaryContainer,
+                shape = RoundedCornerShape(14.dp),
+                modifier = Modifier.size(44.dp)
+            ) {
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Bookmark,
+                        contentDescription = stringResource(R.string.home_favorites),
+                        tint = MaterialTheme.colorScheme.onTertiaryContainer,
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
+            }
+
+            Spacer(Modifier.width(14.dp))
+
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.Center
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Text(
+                        text = stringResource(R.string.home_favorites),
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        fontWeight = FontWeight.Bold
+                    )
+                    if (bookmarksCount > 0) {
+                        Surface(
+                            color = MaterialTheme.colorScheme.tertiary.copy(alpha = 0.15f),
+                            shape = CircleShape
+                        ) {
+                            Text(
+                                text = "$bookmarksCount",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.tertiary,
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp)
+                            )
+                        }
+                    }
+                }
+
+                Spacer(Modifier.height(2.dp))
+
+                val subtitle = if (bookmarksCount > 0) {
+                    if (bookmarksCount == 1 && firstBookmarkName != null) {
+                        firstBookmarkName
+                    } else {
+                        stringResource(R.string.home_favorites_count, bookmarksCount)
+                    }
+                } else {
+                    stringResource(R.string.home_favorites_empty)
+                }
+
+                Text(
+                    text = subtitle,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.75f),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
+
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.ArrowForwardIos,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f),
+                modifier = Modifier.size(16.dp)
+            )
+        }
     }
 }
 

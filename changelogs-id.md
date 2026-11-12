@@ -58,6 +58,9 @@ Semua perubahan penting pada XArchiver akan didokumentasikan dalam berkas ini.
 - **Tata Letak Kategori Bertingkat Cerdas (CategoryGrid)**:
   - Baris pertama menampilkan 2 kartu horizontal lebar untuk kategori utama (**Images** dan **APK**) dengan kontainer ikon di kiri serta nama dan jumlah file di kanan.
   - Baris kedua menampilkan 4 kartu vertikal kompak dalam satu baris untuk kategori **Videos**, **Audio**, **Documents**, dan **Archives**.
+- **Kartu Penuh Favorit / Bookmarks (BookmarkLongItem)**:
+  - Mengintegrasikan fitur Bookmarks/Favorit langsung ke dalam seksi Kategori sebagai kartu panjang selebar layar dengan indikator jumlah folder ditandai dan kontainer bertema tersier Monet.
+  - Membuka folder secara instan saat terdapat 1 bookmark, atau menampilkan Modal Bottom Sheet Material 3 untuk menjelajahi dan mengelola banyak bookmark sekaligus dengan opsi penghapusan cepat.
 - **Grid 2 Kolom untuk Akses Cepat (ShortcutList)**:
   - Menyusun ulang daftar shortcut akses cepat (Bluetooth, Unduhan, WhatsApp, Telegram, dll.) ke dalam tata letak kisi 2 kolom kartu horizontal dengan ikon di sisi kiri dan label teks di sisi kanan.
 - **Bilah Navigasi Mengambang Kapsul (Floating Capsule Bar)**:
