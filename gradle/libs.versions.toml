@@ -39,6 +39,7 @@ androidx-uiautomator-shell = { group = "androidx.test.uiautomator", name = "uiau
 miuix-ui = { group = "top.yukonga.miuix.kmp", name = "miuix-ui", version = "0.9.3" }
 miuix-blur = { group = "top.yukonga.miuix.kmp", name = "miuix-blur", version = "0.9.3" }
 miuix-icons = { group = "top.yukonga.miuix.kmp", name = "miuix-icons", version = "0.9.3" }
+miuix-preference = { group = "top.yukonga.miuix.kmp", name = "miuix-preference", version = "0.9.3" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

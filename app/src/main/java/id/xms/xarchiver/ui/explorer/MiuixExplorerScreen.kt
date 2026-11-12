@@ -84,7 +84,6 @@ fun MiuixExplorerScreen(path: String, navController: NavController) {
     var showNewFolderDialog by remember { mutableStateOf(false) }
     var showNewFileDialog by remember { mutableStateOf(false) }
     var showFileExistsDialog by remember { mutableStateOf<String?>(null) }
-    var showSelectionBottomSheet by remember { mutableStateOf(false) }
     var showCreateArchiveDialog by remember { mutableStateOf(false) }
     var showQuickExtractDialog by remember { mutableStateOf<FileItem?>(null) }
     var showCustomPathDialogFor by remember { mutableStateOf<FileItem?>(null) }
@@ -105,6 +104,9 @@ fun MiuixExplorerScreen(path: String, navController: NavController) {
     // Selection mode state
     val isSelecting = selectionManager.isSelecting
     val selectedCount = selectionManager.selectedCount
+    val selectedPathsList = selectionManager.selectedPaths.toList()
+    val singleFile = if (selectedPathsList.size == 1) files.find { it.path == selectedPathsList.first() } else null
+    val hasArchiveSingle = singleFile != null && !singleFile.isDirectory && FileTypeDetector.isArchiveExtension(singleFile.name)
 
     // Search state
     var isSearching by remember { mutableStateOf(false) }
@@ -640,6 +642,7 @@ fun MiuixExplorerScreen(path: String, navController: NavController) {
                         isDark = isDark,
                         backdrop = backdrop,
                         hasArchives = hasArchives,
+                        selectedCount = selectionManager.selectedPaths.size,
                         onCopy = {
                             pendingFileOperation = Pair("COPY", selectionManager.selectedPaths.toList())
                             selectionManager.clearSelection()
@@ -673,9 +676,45 @@ fun MiuixExplorerScreen(path: String, navController: NavController) {
                         onCompress = {
                             showCreateArchiveDialog = true
                         },
-                        onMore = {
-                            showSelectionBottomSheet = true
-                        }
+                        onRename = {
+                            singleFile?.let {
+                                showRenameDialog = it
+                                selectionManager.clearSelection()
+                            }
+                        },
+                        onProperties = {
+                            singleFile?.let {
+                                showPropertiesDialog = it.path
+                                selectionManager.clearSelection()
+                            }
+                        },
+                        onBookmark = {
+                            singleFile?.let { file ->
+                                scope.launch {
+                                    val isNowBookmarked = bookmarksManager.toggleBookmark(file.path)
+                                    snackbarHostState.showSnackbar(
+                                        if (isNowBookmarked) "Added to bookmarks" else "Removed from bookmarks"
+                                    )
+                                }
+                                selectionManager.clearSelection()
+                            }
+                        },
+                        onShare = {
+                            if (selectedPathsList.size == 1) {
+                                ShareUtils.shareFile(context, selectedPathsList.first())
+                            } else {
+                                ShareUtils.shareMultipleFiles(context, selectedPathsList)
+                            }
+                            selectionManager.clearSelection()
+                        },
+                        onOpenArchive = if (hasArchiveSingle) {
+                            {
+                                singleFile?.let {
+                                    showQuickExtractDialog = it
+                                    selectionManager.clearSelection()
+                                }
+                            }
+                        } else null
                     )
                 }
             }
@@ -683,12 +722,9 @@ fun MiuixExplorerScreen(path: String, navController: NavController) {
     }
 
     // Modal Dialogs, Bottom Sheets & Progress Overlays Host
-    val selectedPathsList = selectionManager.selectedPaths.toList()
-    val singleFile = if (selectedPathsList.size == 1) files.find { it.path == selectedPathsList.first() } else null
-
     MiuixExplorerDialogHost(
         currentPath = path,
-        showSelectionBottomSheet = showSelectionBottomSheet,
+        showSelectionBottomSheet = false,
         selectedPaths = selectedPathsList,
         singleFile = singleFile,
         showPropertiesDialog = showPropertiesDialog,
@@ -716,7 +752,7 @@ fun MiuixExplorerScreen(path: String, navController: NavController) {
         secondaryTextColor = secondaryTextColor,
         miuixBlue = miuixBlue,
         miuixRed = miuixRed,
-        onDismissSelectionBottomSheet = { showSelectionBottomSheet = false },
+        onDismissSelectionBottomSheet = {},
         onRenameSingleFile = { showRenameDialog = it },
         onShareSelected = { paths ->
             if (paths.size == 1) {

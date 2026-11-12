@@ -10,6 +10,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.NoteAdd
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -23,11 +24,14 @@ import androidx.compose.ui.unit.sp
 import id.xms.xarchiver.R
 import top.yukonga.miuix.kmp.basic.Button
 import top.yukonga.miuix.kmp.basic.ButtonDefaults
+import top.yukonga.miuix.kmp.basic.DropdownEntry
+import top.yukonga.miuix.kmp.basic.DropdownItem
 import top.yukonga.miuix.kmp.basic.Icon
 import top.yukonga.miuix.kmp.basic.Surface
 import top.yukonga.miuix.kmp.basic.Text
 import top.yukonga.miuix.kmp.blur.LayerBackdrop
 import top.yukonga.miuix.kmp.blur.textureBlur
+import top.yukonga.miuix.kmp.menu.WindowIconDropdownMenu
 import top.yukonga.miuix.kmp.theme.MiuixTheme
 
 @Composable
@@ -35,12 +39,17 @@ fun MiuixSelectionDock(
     isDark: Boolean,
     backdrop: LayerBackdrop,
     hasArchives: Boolean,
+    selectedCount: Int,
     onCopy: () -> Unit,
     onCut: () -> Unit,
     onDelete: () -> Unit,
     onExtractOrShare: () -> Unit,
     onCompress: () -> Unit,
-    onMore: () -> Unit
+    onRename: () -> Unit,
+    onProperties: () -> Unit,
+    onBookmark: () -> Unit,
+    onShare: () -> Unit,
+    onOpenArchive: (() -> Unit)? = null
 ) {
     Surface(
         modifier = Modifier
@@ -75,7 +84,112 @@ fun MiuixSelectionDock(
                 MiuixDockAction(icon = Icons.Default.Share, label = "Bagikan", onClick = onExtractOrShare)
             }
             MiuixDockAction(icon = Icons.Default.FolderZip, label = "Kompres", onClick = onCompress)
-            MiuixDockAction(icon = Icons.Default.MoreVert, label = "Lainnya", onClick = onMore)
+
+            val moreItems = remember(selectedCount, onOpenArchive, onRename, onProperties, onBookmark, onShare) {
+                buildList {
+                    if (selectedCount == 1) {
+                        add(
+                            DropdownItem(
+                                text = "Ganti Nama",
+                                icon = { modifier ->
+                                    Icon(
+                                        imageVector = Icons.Default.Edit,
+                                        contentDescription = null,
+                                        modifier = modifier,
+                                        tint = MiuixTheme.colorScheme.primary
+                                    )
+                                },
+                                onClick = onRename
+                            )
+                        )
+                        add(
+                            DropdownItem(
+                                text = "Properti",
+                                icon = { modifier ->
+                                    Icon(
+                                        imageVector = Icons.Default.Info,
+                                        contentDescription = null,
+                                        modifier = modifier,
+                                        tint = MiuixTheme.colorScheme.primary
+                                    )
+                                },
+                                onClick = onProperties
+                            )
+                        )
+                        add(
+                            DropdownItem(
+                                text = "Tambah Bookmark",
+                                icon = { modifier ->
+                                    Icon(
+                                        imageVector = Icons.Default.Bookmark,
+                                        contentDescription = null,
+                                        modifier = modifier,
+                                        tint = MiuixTheme.colorScheme.primary
+                                    )
+                                },
+                                onClick = onBookmark
+                            )
+                        )
+                    }
+                    add(
+                        DropdownItem(
+                            text = "Bagikan",
+                            icon = { modifier ->
+                                Icon(
+                                    imageVector = Icons.Default.Share,
+                                    contentDescription = null,
+                                    modifier = modifier,
+                                    tint = MiuixTheme.colorScheme.primary
+                                )
+                            },
+                            onClick = onShare
+                        )
+                    )
+                    if (onOpenArchive != null) {
+                        add(
+                            DropdownItem(
+                                text = "Buka Arsip",
+                                icon = { modifier ->
+                                    Icon(
+                                        imageVector = Icons.Default.FolderZip,
+                                        contentDescription = null,
+                                        modifier = modifier,
+                                        tint = MiuixTheme.colorScheme.primary
+                                    )
+                                },
+                                onClick = onOpenArchive
+                            )
+                        )
+                    }
+                }
+            }
+
+            WindowIconDropdownMenu(
+                entry = DropdownEntry(items = moreItems),
+                backgroundColor = Color.Transparent,
+                minWidth = 0.dp,
+                minHeight = 0.dp,
+                cornerRadius = 12.dp
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.MoreVert,
+                        contentDescription = "Lainnya",
+                        tint = MiuixTheme.colorScheme.onSurface,
+                        modifier = Modifier.size(22.dp)
+                    )
+                    Spacer(Modifier.height(3.dp))
+                    Text(
+                        text = "Lainnya",
+                        color = MiuixTheme.colorScheme.onSurface,
+                        fontSize = 10.sp,
+                        fontWeight = FontWeight.Medium
+                    )
+                }
+            }
         }
     }
 }
