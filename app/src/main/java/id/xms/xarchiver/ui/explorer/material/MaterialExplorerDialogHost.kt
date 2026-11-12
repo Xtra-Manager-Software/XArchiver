@@ -10,7 +10,6 @@ import id.xms.xarchiver.core.FileOperationProgress
 import id.xms.xarchiver.core.archive.*
 import id.xms.xarchiver.ui.archive.ArchivePasswordDialog
 import id.xms.xarchiver.ui.archive.CreateArchiveDialog
-import id.xms.xarchiver.ui.components.FolderPickerDialog
 import id.xms.xarchiver.ui.components.PropertiesDialog
 import java.io.File
 
@@ -20,6 +19,7 @@ import java.io.File
  */
 @Composable
 fun MaterialExplorerDialogHost(
+    currentPath: String? = null,
     showSelectionBottomSheet: Boolean,
     selectedPaths: List<String>,
     singleFile: FileItem?,
@@ -198,11 +198,13 @@ fun MaterialExplorerDialogHost(
         )
     }
 
-    // 11. Folder Picker Dialog for Custom Path Extraction
+    // 11. Folder Picker BottomSheet for Custom Path Extraction
     showCustomPathDialogFor?.let { file ->
-        FolderPickerDialog(
-            title = "Extract to...",
-            onDismissRequest = onDismissCustomPath,
+        MaterialFolderPickerBottomSheet(
+            operation = "EXTRACT",
+            itemCount = 1,
+            initialPath = currentPath,
+            onDismiss = onDismissCustomPath,
             onFolderSelected = { selectedPath -> onCustomPathFolderSelected(file, selectedPath) }
         )
     }
@@ -219,11 +221,13 @@ fun MaterialExplorerDialogHost(
         )
     }
 
-    // 13. Folder Picker for Copy / Move operations
+    // 13. Folder Picker BottomSheet for Copy / Move operations
     pendingFileOperation?.let { operation ->
-        FolderPickerDialog(
-            title = if (operation.first == "COPY") "Copy to..." else "Move to...",
-            onDismissRequest = onDismissFileOperation,
+        MaterialFolderPickerBottomSheet(
+            operation = operation.first,
+            itemCount = operation.second.size,
+            initialPath = currentPath,
+            onDismiss = onDismissFileOperation,
             onFolderSelected = { selectedPath ->
                 onFileOperationDestinationSelected(operation.first, operation.second, selectedPath)
             }

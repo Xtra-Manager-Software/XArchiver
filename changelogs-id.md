@@ -18,6 +18,18 @@ Semua perubahan penting pada XArchiver akan didokumentasikan dalam berkas ini.
 - **Bilah Navigasi Mengambang Kapsul Ganda**:
   - Menggabungkan kapsul navigasi melayang (*texture blur* kaca) untuk peralihan mulus antara tab **Baru-baru ini** dan **Telusuri**.
 
+### Fitur Baru - Pemilih Folder Tujuan Berbasis Modal BottomSheet untuk Salin, Pindah & Ekstrak
+- **Mengganti Dialog Popup Lawas dengan Modal BottomSheet**:
+  - Mengganti dialog popup tengah `FolderPickerDialog` yang kaku dengan modal bottom sheet modern yang meluncur mulus dari bawah layar.
+- **Implementasi Terpisah untuk Gaya Material 3 dan MIUIX HyperOS**:
+  - **Material 3 (`MaterialFolderPickerBottomSheet`)**: Mengikuti pedoman Material You Monet, kontainer `surfaceContainerLow`, pegangan geser (*drag handle*) standar, dan elevasi adaptif.
+  - **MIUIX HyperOS (`MiuixFolderPickerBottomSheet`)**: Meniru gaya pengelola berkas bawaan HyperOS dengan sudut melengkung 24dp, pegangan kapsul mini, kontainer ikon folder amber hangat, dan tombol aksi kapsul khas MIUIX.
+- **Navigasi Partisi & Hierarki Folder Bertingkat**:
+  - Pemilih partisi penyimpanan (Penyimpanan Internal, Kartu SD, Root) lengkap dengan informasi kapasitas sisa serta pintasan kartu "Folder Saat Ini".
+  - Penjelajahan folder mendalam dengan panah kembali serta integrasi gestur kembali sistem Android (`BackHandler`) yang menaikkan tingkat folder tanpa menutup bottom sheet secara tiba-tiba.
+  - Tombol buat folder baru terintegrasi langsung pada bilah navigasi untuk membuat dan otomatis langsung masuk ke folder tujuan baru.
+  - Tombol aksi konfirmasi kontekstual ("Salin di sini", "Pindah ke sini", "Ekstrak di sini") yang aktif dinamis saat folder tujuan valid terpilih.
+
 ### Fitur Baru - Pemantauan & Penyegaran Berkas Realtime Otomatis
 - **Pemantau Direktori Waktu-Nyata Berbasis Kernel (DirectoryWatcher & inotify)**:
   - Mengintegrasikan `android.os.FileObserver` untuk mendeteksi event inotify kernel Linux secara langsung pada direktori yang sedang dibuka (pembuatan berkas/folder baru, penghapusan, pemindahan berkas keluar/masuk, dan penulisan berkas selesai).

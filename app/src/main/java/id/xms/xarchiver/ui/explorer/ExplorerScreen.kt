@@ -759,6 +759,7 @@ fun ExplorerScreen(path: String, navController: NavController) {
     val singleFile = if (selectedPathsList.size == 1) files.find { it.path == selectedPathsList.first() } else null
 
     MaterialExplorerDialogHost(
+        currentPath = path,
         showSelectionBottomSheet = showSelectionBottomSheet,
         selectedPaths = selectedPathsList,
         singleFile = singleFile,

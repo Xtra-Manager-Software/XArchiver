@@ -12,7 +12,6 @@ import id.xms.xarchiver.core.FileOperationProgress
 import id.xms.xarchiver.core.archive.*
 import id.xms.xarchiver.ui.archive.ArchivePasswordDialog
 import id.xms.xarchiver.ui.archive.CreateArchiveDialog
-import id.xms.xarchiver.ui.components.FolderPickerDialog
 import id.xms.xarchiver.ui.components.PropertiesDialog
 import id.xms.xarchiver.ui.explorer.utils.FileTypeDetector
 import java.io.File
@@ -23,6 +22,7 @@ import java.io.File
  */
 @Composable
 fun MiuixExplorerDialogHost(
+    currentPath: String? = null,
     // Dialog visibility & targets
     showSelectionBottomSheet: Boolean,
     selectedPaths: List<String>,
@@ -268,11 +268,21 @@ fun MiuixExplorerDialogHost(
         )
     }
 
-    // 11. Custom Path Folder Picker Dialog for Extraction
+    // 11. Custom Path Folder Picker BottomSheet for Extraction
     showCustomPathDialogFor?.let { file ->
-        FolderPickerDialog(
-            title = "Extract to...",
-            onDismissRequest = onDismissCustomPath,
+        MiuixFolderPickerBottomSheet(
+            operation = "EXTRACT",
+            itemCount = 1,
+            initialPath = currentPath,
+            isDark = isDark,
+            cardBgColor = cardBgColor,
+            cardBorderColor = cardBorderColor,
+            dividerColor = dividerColor,
+            inputBgColor = inputBgColor,
+            primaryTextColor = primaryTextColor,
+            secondaryTextColor = secondaryTextColor,
+            miuixBlue = miuixBlue,
+            onDismiss = onDismissCustomPath,
             onFolderSelected = { selectedPath -> onCustomPathFolderSelected(file, selectedPath) }
         )
     }
@@ -289,11 +299,21 @@ fun MiuixExplorerDialogHost(
         )
     }
 
-    // 13. Folder Picker for Copy / Move operations
+    // 13. Folder Picker BottomSheet for Copy / Move operations
     pendingFileOperation?.let { operation ->
-        FolderPickerDialog(
-            title = if (operation.first == "COPY") "Copy to..." else "Move to...",
-            onDismissRequest = onDismissFileOperation,
+        MiuixFolderPickerBottomSheet(
+            operation = operation.first,
+            itemCount = operation.second.size,
+            initialPath = currentPath,
+            isDark = isDark,
+            cardBgColor = cardBgColor,
+            cardBorderColor = cardBorderColor,
+            dividerColor = dividerColor,
+            inputBgColor = inputBgColor,
+            primaryTextColor = primaryTextColor,
+            secondaryTextColor = secondaryTextColor,
+            miuixBlue = miuixBlue,
+            onDismiss = onDismissFileOperation,
             onFolderSelected = { selectedPath ->
                 onFileOperationDestinationSelected(operation.first, operation.second, selectedPath)
             }

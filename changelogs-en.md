@@ -18,6 +18,18 @@ All notable changes to XArchiver will be documented in this file.
 - **Dual-Capsule Floating Navigation**:
   - Features a floating frosted glassmorphism navigation capsule for seamless switching between **Recent** and **Browse** tabs.
 
+### New Features - Modal BottomSheet Destination Picker for Copy, Move & Extract
+- **Replaced Desktop Popup Dialog with Native Modal BottomSheets**:
+  - Replaced legacy centered popup `FolderPickerDialog` with modern mobile modal bottom sheets sliding smoothly from the bottom.
+- **Dedicated Material 3 and MIUIX HyperOS Implementations**:
+  - **Material 3 (`MaterialFolderPickerBottomSheet`)**: Built using Material You tokens, `surfaceContainerLow` backdrop, standard drag handle, and adaptive color containers.
+  - **MIUIX HyperOS (`MiuixFolderPickerBottomSheet`)**: Styled with HyperOS file manager aesthetics, 24dp rounded corners, centered pill drag handle, warm amber folder squircle containers, and MIUIX vibrant pill action buttons.
+- **Hierarchical Storage & Subfolder Navigation**:
+  - Partition selector (Internal Storage, SD Card, Root) with available space breakdown and a "Current Folder" fast-jump card.
+  - Deep folder traversal with back arrow navigation and Android system back gesture (`BackHandler`) integration that steps up folder levels instead of abruptly closing the sheet.
+  - Inline "New Folder" creation button right in the navigation bar to create and automatically enter newly created destination folders.
+  - Contextual confirm action button ("Copy here", "Move here", "Extract here") enabled dynamically upon valid directory selection.
+
 ### New Features - Automated Realtime File & Directory Auto-Refresh
 - **Kernel-Level Realtime Directory Watching (DirectoryWatcher & inotify)**:
   - Integrated `android.os.FileObserver` to capture Linux kernel inotify events directly on the active folder (file/directory creation, deletion, moves in/out, and write completions).

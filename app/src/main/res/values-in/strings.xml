@@ -141,6 +141,21 @@
     <string name="dialog_file_exists_desc">File dengan nama \'%1$s\' sudah ada. Apa yang ingin Anda lakukan?</string>
     <string name="action_overwrite">Timpa</string>
     <string name="action_duplicate">Duplikat</string>
+
+    <!-- Folder Picker BottomSheet -->
+    <string name="folder_picker_copy_title">Salin ke…</string>
+    <string name="folder_picker_move_title">Pindahkan ke…</string>
+    <string name="folder_picker_extract_title">Ekstrak ke…</string>
+    <string name="folder_picker_select_title">Pilih Folder</string>
+    <string name="folder_picker_copy_action">Salin di sini</string>
+    <string name="folder_picker_move_action">Pindah ke sini</string>
+    <string name="folder_picker_extract_action">Ekstrak di sini</string>
+    <string name="folder_picker_select_action">Pilih folder ini</string>
+    <string name="folder_picker_select_storage">Pilih Penyimpanan</string>
+    <string name="folder_picker_current_folder">Folder Saat Ini</string>
+    <string name="folder_picker_new_folder">Folder baru</string>
+    <string name="folder_picker_empty">Folder ini kosong</string>
+    <string name="folder_picker_items_count">%1$d item terpilih</string>
     
     <string name="fab_recent">Terbaru</string>
     <string name="fab_files">File</string>

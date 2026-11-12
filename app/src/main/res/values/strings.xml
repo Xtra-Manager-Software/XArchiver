@@ -141,6 +141,21 @@
     <string name="dialog_file_exists_desc">A file named \'%1$s\' already exists. What would you like to do?</string>
     <string name="action_overwrite">Overwrite</string>
     <string name="action_duplicate">Duplicate</string>
+
+    <!-- Folder Picker BottomSheet -->
+    <string name="folder_picker_copy_title">Copy to…</string>
+    <string name="folder_picker_move_title">Move to…</string>
+    <string name="folder_picker_extract_title">Extract to…</string>
+    <string name="folder_picker_select_title">Select Folder</string>
+    <string name="folder_picker_copy_action">Copy here</string>
+    <string name="folder_picker_move_action">Move here</string>
+    <string name="folder_picker_extract_action">Extract here</string>
+    <string name="folder_picker_select_action">Select this folder</string>
+    <string name="folder_picker_select_storage">Select Storage</string>
+    <string name="folder_picker_current_folder">Current Folder</string>
+    <string name="folder_picker_new_folder">New folder</string>
+    <string name="folder_picker_empty">Empty folder</string>
+    <string name="folder_picker_items_count">%1$d item%2$s selected</string>
     
     <string name="fab_recent">Recent</string>
     <string name="fab_files">Files</string>
