@@ -44,6 +44,30 @@ object ChangelogRepository {
             badgeRes = R.string.changelog_badge_latest,
             items = listOf(
                 ChangelogItem(
+                    titleRes = R.string.changelog_item_2_1_9_folder_picker_title,
+                    descRes = R.string.changelog_item_2_1_9_folder_picker_desc,
+                    category = ChangelogCategory.UI,
+                    tags = listOf("ModalBottomSheet", "FolderPicker", "Copy", "Move", "Extract", "Material 3", "MIUIX")
+                ),
+                ChangelogItem(
+                    titleRes = R.string.changelog_item_2_1_9_selection_dock_title,
+                    descRes = R.string.changelog_item_2_1_9_selection_dock_desc,
+                    category = ChangelogCategory.UI,
+                    tags = listOf("Spring Physics", "macOS Dock", "Scale Animation", "DropdownMenu", "HyperOS", "Tactile Press")
+                ),
+                ChangelogItem(
+                    titleRes = R.string.changelog_item_2_1_9_properties_title,
+                    descRes = R.string.changelog_item_2_1_9_properties_desc,
+                    category = ChangelogCategory.UI,
+                    tags = listOf("MIUIX", "Properties Dialog", "POSIX Permissions", "st_mode", "644", "755")
+                ),
+                ChangelogItem(
+                    titleRes = R.string.changelog_item_2_1_9_bookmarks_title,
+                    descRes = R.string.changelog_item_2_1_9_bookmarks_desc,
+                    category = ChangelogCategory.FEATURES,
+                    tags = listOf("Bookmarks", "Favorites", "Universal Files", "Folders", "Home Screen")
+                ),
+                ChangelogItem(
                     titleRes = R.string.changelog_item_2_1_9_realtime_title,
                     descRes = R.string.changelog_item_2_1_9_realtime_desc,
                     category = ChangelogCategory.FEATURES,

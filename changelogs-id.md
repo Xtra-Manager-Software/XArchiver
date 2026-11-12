@@ -2,14 +2,14 @@
 
 Semua perubahan penting pada XArchiver akan didokumentasikan dalam berkas ini.
 
-## [2.1.9] - 2026-10-08
+## [2.1.9] - 2026-11-12
 
 ### Desain Ulang Antarmuka - Beranda MIUIX HyperOS Modern
 - **Tata Letak Pil Kategori 2 Kolom × 3 Baris**:
   - Mengadopsi arsitektur visual resmi Pengelola Berkas HyperOS dengan deretan pil bersudut squircle 18dp: **Dok** (Amber), **Gambar** (Royal Blue), **Video** (Purple), **Musik** (Coral Red), **Arsip** (Cyan), dan **APK** (Emerald Green).
   - Dilengkapi ikon kontainer bersudut melengkung yang khas dan penghitungan jumlah item berkas aktual secara asinkron.
 - **Grup Akses Cepat Terpadu**:
-  - Kartu sudut membulat 20dp yang menggabungkan akses langsung ke folder **Unduhan** (`/sdcard/Download`) dan **Favorit** (terintegrasi dengan `BookmarksManager` lokal yang menampilkan jumlah folder yang ditandai).
+  - Kartu sudut membulat 20dp yang menggabungkan akses langsung ke folder **Unduhan** (`/sdcard/Download`) dan **Favorit** (terintegrasi dengan `BookmarksManager` lokal yang menampilkan jumlah berkas dan folder yang ditandai).
 - **Kartu Penyimpanan Modern & Dukungan Root Privileged**:
   - Menampilkan penyimpanan internal ("Ponsel saya") lengkap dengan indikator sisa kapasitas, *segmented thin progress gauge* 4dp, dan badge sistem berkas (seperti F2FS/ext4).
   - Menghadirkan baris khusus **Penyimpanan Sistem (Root)** dengan badge Root Amber saat opsi akses Root aktif.
@@ -17,6 +17,32 @@ Semua perubahan penting pada XArchiver akan didokumentasikan dalam berkas ini.
   - Mengelompokkan jalan pintas direktori media utama: **Kamera** (`DCIM/Camera`), **Screenshot & rekaman layar** (`Pictures/Screenshots`), serta pintasan berkas pesan (WhatsApp, Telegram, Bluetooth).
 - **Bilah Navigasi Mengambang Kapsul Ganda**:
   - Menggabungkan kapsul navigasi melayang (*texture blur* kaca) untuk peralihan mulus antara tab **Baru-baru ini** dan **Telusuri**.
+
+### Fitur Baru & Peningkatan - Dock Seleksi Animasi Pegas & Menu Bersih HyperOS
+- **Animasi Dock Melayang Bergaya macOS Dock (Spring & Scale)**:
+  - Menerapkan fisika pegas *bouncy spring overshoot* (`dampingRatio = 0.68f`) dipadukan dengan penskalaan dinamis (`scaleIn` 0.85 dengan jangkar bawah tengah) pada bilah aksi bawah seleksi dan clipboard. Dock muncul membal secara elegan dari tepi bawah layar saat mode seleksi aktif.
+  - Menambahkan feedback sentuh taktil (*interactive spring press*) pada setiap tombol aksi di dock: ikon menyusut halus (`0.88f`) saat ditekan dan membal kembali saat dilepas.
+- **Menu Dropdown "Lainnya" Minimalis & Tanpa Ikon**:
+  - Mengganti bottom sheet seleksi lawas dengan `WindowIconDropdownMenu` yang ringkas dan bersih tanpa deretan ikon samping, meniru estetika menu pop-up pengelola berkas bawaan HyperOS.
+  - Memperbarui tombol "Lainnya" dengan ikon lingkaran tiga titik horizontal (`MoreHoriz`) khas HyperOS dan menghilangkan tombol Bagikan redundan dari bilah aksi utama.
+  - Memperbaiki `IllegalStateException` pada `LocalNavigationEventDispatcherOwner` di Android 14/15 (HyperOS 2) dengan mengikat `NavigationEventDispatcherOwner` pada view tree dan Compose root.
+
+### Fitur Baru - Dialog Rincian Native MIUIX & Format Izin POSIX
+- **Dialog Rincian Native MIUIX (`MiuixPropertiesDialog`)**:
+  - Mengganti dialog Material 3 hijau dengan dialog native MIUIX yang menyatu harmonis dengan tema aplikasi (`MiuixTheme`, kontainer squircle gelap/terang, dan tombol aksi primer MIUIX).
+- **Format Izin POSIX Standar Linux (`644 (rw-r--r--)` / `755 (rwxr-xr-x)`)**:
+  - Mengganti tampilan izin lama yang menempel (*"BacaTulisEksekusi"*) menjadi format standar Linux oktal dan rwx menggunakan `android.system.Os.stat` (`st_mode`), contoh: `644 (rw-r--r--)` untuk berkas dan `755 (rwxr-xr-x)` untuk folder/program eksekusi.
+  - Diterapkan secara konsisten di dialog rincian gaya MIUIX maupun dialog properti gaya Material 3.
+
+### Fitur Baru - Bookmark Universal untuk Berkas & Folder
+- **Dukungan Penuh Bookmark Semua Berkas & Folder**:
+  - Memperluas sistem bookmark `BookmarksManager` sehingga tidak terbatas hanya pada folder, tetapi juga mendukung penandaan berkas jenis apa pun (foto, video, dokumen, arsip, APK).
+  - Saat item bookmark diketuk, aplikasi membuka berkas secara langsung sesuai tipenya (atau masuk ke folder jika berupa direktori).
+- **Integrasi Kartu Favorit di Beranda Material & MIUIX**:
+  - Menambahkan kartu Favorit/Bookmark di bagian kategori Beranda Material lengkap dengan modal bottom sheet manajemen bookmark interaktif untuk menghapus atau membuka item favorit.
+
+### Peningkatan Kualitas & Lokalisasi Penuh (i18n)
+- Menghapus string teks hardcoded pada dock aksi dan bilah tempel seleksi, mengalihkannya ke berkas resource string `strings.xml` (Inggris dan Indonesia).
 
 ### Fitur Baru - Pemilih Folder Tujuan Berbasis Modal BottomSheet untuk Salin, Pindah & Ekstrak
 - **Mengganti Dialog Popup Lawas dengan Modal BottomSheet**:

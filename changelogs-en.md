@@ -2,14 +2,14 @@
 
 All notable changes to XArchiver will be documented in this file.
 
-## [2.1.9] - 2026-10-08
+## [2.1.9] - 2026-11-12
 
 ### UI Redesign - Modernized MIUIX HyperOS Home Screen
 - **2-Column x 3-Row Category Pills Layout**:
   - Adopted the official HyperOS File Manager visual layout with 18dp squircle pill cards: **Docs** (Amber), **Images** (Royal Blue), **Videos** (Purple), **Music** (Coral Red), **Archives** (Cyan), and **APK** (Emerald Green).
   - Features dedicated squircle icon containers with distinct vibrant accent colors and live asynchronous item count indicators.
 - **Consolidated Quick Access Group**:
-  - Refined 20dp rounded surface combining direct access to **Downloads** (`/sdcard/Download`) and **Favorites** (integrated with the local `BookmarksManager` displaying live bookmarked folder count).
+  - Refined 20dp rounded surface combining direct access to **Downloads** (`/sdcard/Download`) and **Favorites** (integrated with the local `BookmarksManager` displaying live bookmarked items count).
 - **Modern Storage Card & Privileged Root Integration**:
   - Displays primary internal storage ("My phone") with remaining capacity breakdown, a slim 4dp linear progress bar, and filesystem badge (e.g. F2FS/ext4).
   - Seamlessly integrates a dedicated **System Storage (Root)** card row with amber Root badge when privileged access is enabled.
@@ -17,6 +17,32 @@ All notable changes to XArchiver will be documented in this file.
   - Grouped access to core media folders: **Camera** (`DCIM/Camera`), **Screenshots & screen recordings** (`Pictures/Screenshots`), and messaging media directories (WhatsApp, Telegram, Bluetooth).
 - **Dual-Capsule Floating Navigation**:
   - Features a floating frosted glassmorphism navigation capsule for seamless switching between **Recent** and **Browse** tabs.
+
+### New Features & Improvements - Spring-Animated Selection Dock & Clean HyperOS Menu
+- **macOS Dock-Inspired Spring & Scale Animation**:
+  - Applied bouncy spring overshoot physics (`dampingRatio = 0.68f`) combined with dynamic bottom-origin scale (`scaleIn` 0.85) to the floating selection and clipboard docks. The dock pops up with elasticity from the screen edge upon entering multi-selection mode.
+  - Added tactile spring press feedback to all dock action buttons: items subtly depress (`0.88f`) when touched and spring back upon release.
+- **Minimalist, Text-Only "More" Dropdown Menu**:
+  - Replaced the bottom sheet with a compact, text-only `WindowIconDropdownMenu` matching official HyperOS File Manager aesthetics without redundant item icons.
+  - Updated the "More" button to use HyperOS's circular horizontal three-dots icon (`MoreHoriz`) and removed redundant Share action from the main dock.
+  - Resolved `IllegalStateException` on `LocalNavigationEventDispatcherOwner` across Android 14/15 (HyperOS 2) by binding `NavigationEventDispatcherOwner` to the view tree and Compose roots.
+
+### New Features - Native MIUIX Details Dialog & POSIX Permissions
+- **Native MIUIX Properties Dialog (`MiuixPropertiesDialog`)**:
+  - Replaced the generic Material dialog with an authentic MIUIX-styled dialog conforming to `MiuixTheme`, squircle surface styling, and primary pill buttons.
+- **Linux POSIX Permission Formatting (`644 (rw-r--r--)` / `755 (rwxr-xr-x)`)**:
+  - Upgraded permission strings from raw concatenations ("BacaTulisEksekusi") to standard Linux octal and rwx notations using `android.system.Os.stat` (`st_mode`), such as `644 (rw-r--r--)` for files and `755 (rwxr-xr-x)` for directories/executables.
+  - Consistently applied across both MIUIX and Material dialog implementations.
+
+### New Features - Universal File & Folder Bookmarks
+- **Universal Storage Bookmarking**:
+  - Expanded `BookmarksManager` to support bookmarking individual files of any type (images, videos, documents, archives, APKs) in addition to folders.
+  - Directly opens bookmarked files with their respective handlers or navigates into directories upon clicking.
+- **Material & MIUIX Home Screen Integration**:
+  - Added a dedicated Favorites/Bookmarks card in the Material Home Categories grid with an interactive management modal bottom sheet to view, open, or delete favorites.
+
+### Quality & Full Localization (i18n)
+- Eliminated all hardcoded strings on action docks and clipboard bars, migrating them to Android string resources with complete English and Indonesian support.
 
 ### New Features - Modal BottomSheet Destination Picker for Copy, Move & Extract
 - **Replaced Desktop Popup Dialog with Native Modal BottomSheets**:
