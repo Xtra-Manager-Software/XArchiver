@@ -99,8 +99,8 @@
     <string name="home_camera_desc">Photos &amp; camera captures</string>
     <string name="home_screenshots">Screenshots &amp; recordings</string>
     <string name="home_screenshots_desc">Device screen captures</string>
-    <string name="home_favorites_count">%1$d bookmarked folders</string>
-    <string name="home_favorites_empty">No bookmarked folders</string>
+    <string name="home_favorites_count">%1$d bookmarked items</string>
+    <string name="home_favorites_empty">No bookmarked items</string>
     <string name="home_cat_doc">Docs</string>
     <string name="home_cat_image">Images</string>
     <string name="home_cat_video">Videos</string>

@@ -244,7 +244,7 @@ fun HomeScreen(navController: NavController, viewModel: HomeViewModel = viewMode
                                             navController.navigate("explorer/${Uri.encode("/sdcard")}")
                                         }
                                         bookmarks.size == 1 -> {
-                                            navController.navigate("explorer/${Uri.encode(bookmarks.first().path)}")
+                                            openBookmarkItem(context, bookmarks.first(), navController)
                                         }
                                         else -> {
                                             showBookmarksSheet = true
@@ -585,12 +585,25 @@ fun HomeScreen(navController: NavController, viewModel: HomeViewModel = viewMode
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         items(bookmarks, key = { it.path }) { bookmark ->
+                            val actualFile = remember(bookmark.path) { java.io.File(bookmark.path) }
+                            val isDir = actualFile.isDirectory || (!actualFile.exists() && !bookmark.name.contains("."))
+                            val icon = remember(bookmark.name, isDir) { getBookmarkItemIcon(bookmark.name, isDir) }
+                            val subtitle = if (isDir) {
+                                bookmark.path
+                            } else {
+                                if (actualFile.exists()) {
+                                    "${actualFile.length().humanReadable()} • ${bookmark.path}"
+                                } else {
+                                    bookmark.path
+                                }
+                            }
+
                             Card(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .clickable {
                                         showBookmarksSheet = false
-                                        navController.navigate("explorer/${Uri.encode(bookmark.path)}")
+                                        openBookmarkItem(context, bookmark, navController)
                                     },
                                 colors = CardDefaults.cardColors(
                                     containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
@@ -604,7 +617,7 @@ fun HomeScreen(navController: NavController, viewModel: HomeViewModel = viewMode
                                         .padding(horizontal = 14.dp, vertical = 12.dp)
                                 ) {
                                     Surface(
-                                        color = MaterialTheme.colorScheme.primaryContainer,
+                                        color = if (isDir) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.tertiaryContainer,
                                         shape = RoundedCornerShape(12.dp),
                                         modifier = Modifier.size(40.dp)
                                     ) {
@@ -613,9 +626,9 @@ fun HomeScreen(navController: NavController, viewModel: HomeViewModel = viewMode
                                             modifier = Modifier.fillMaxSize()
                                         ) {
                                             Icon(
-                                                imageVector = Icons.Filled.Folder,
+                                                imageVector = icon,
                                                 contentDescription = null,
-                                                tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                                                tint = if (isDir) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onTertiaryContainer,
                                                 modifier = Modifier.size(22.dp)
                                             )
                                         }
@@ -634,7 +647,7 @@ fun HomeScreen(navController: NavController, viewModel: HomeViewModel = viewMode
                                         )
                                         Spacer(Modifier.height(2.dp))
                                         Text(
-                                            text = bookmark.path,
+                                            text = subtitle,
                                             style = MaterialTheme.typography.bodySmall,
                                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                                             maxLines = 1,
@@ -1091,6 +1104,50 @@ private fun openRecentItem(context: Context, file: FileItem, navController: NavC
         else -> {
             ShareUtils.openFile(context, file.path)
         }
+    }
+}
+
+internal fun openBookmarkItem(context: Context, bookmark: Bookmark, navController: NavController) {
+    val actualFile = java.io.File(bookmark.path)
+    if (!actualFile.exists()) {
+        val parent = actualFile.parentFile
+        if (parent != null && parent.exists()) {
+            navController.navigate("explorer/${Uri.encode(parent.absolutePath)}")
+        } else {
+            navController.navigate("explorer/${Uri.encode("/sdcard")}")
+        }
+        return
+    }
+
+    if (actualFile.isDirectory) {
+        navController.navigate("explorer/${Uri.encode(actualFile.absolutePath)}")
+    } else {
+        openRecentItem(
+            context,
+            FileItem(
+                name = actualFile.name,
+                path = actualFile.absolutePath,
+                size = actualFile.length(),
+                isDirectory = false,
+                lastModified = actualFile.lastModified()
+            ),
+            navController
+        )
+    }
+}
+
+internal fun getBookmarkItemIcon(name: String, isDirectory: Boolean): androidx.compose.ui.graphics.vector.ImageVector {
+    if (isDirectory) return Icons.Filled.Folder
+    val ext = name.substringAfterLast('.', "").lowercase()
+    return when {
+        ext in listOf("jpg", "jpeg", "png", "webp", "gif", "bmp") -> Icons.Filled.Image
+        ext in listOf("mp4", "mkv", "webm", "avi", "3gp") -> Icons.Filled.VideoLibrary
+        ext in listOf("mp3", "m4a", "wav", "flac", "ogg", "aac") -> Icons.Filled.MusicNote
+        ext in listOf("zip", "rar", "7z", "tar", "gz", "xz", "bz2") -> Icons.Filled.FolderZip
+        name.endsWith(".apk", ignoreCase = true) -> Icons.Filled.Android
+        ext in listOf("txt", "log", "json", "xml", "html", "css", "js", "kt", "java", "md", "sh") -> Icons.Filled.Description
+        ext in listOf("pdf", "doc", "docx", "xls", "xlsx", "ppt", "pptx") -> Icons.Filled.Description
+        else -> Icons.AutoMirrored.Filled.InsertDriveFile
     }
 }
 

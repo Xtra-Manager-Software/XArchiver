@@ -60,7 +60,7 @@ All notable changes to XArchiver will be documented in this file.
   - Second row displays 4 compact vertical cards in a single row for **Videos**, **Audio**, **Documents**, and **Archives**.
 - **Full-Width Bookmarks / Favorites Card (BookmarkLongItem)**:
   - Integrated Bookmarks directly into the Categories section as a wide full-width card with active bookmark count indicator and tertiary Monet container.
-  - Tapping opens the bookmarked folder directly when 1 bookmark is saved, or opens a dedicated Material 3 Modal Bottom Sheet to manage and navigate among multiple bookmarks with instant un-bookmark options.
+  - Tapping opens the bookmarked item directly (directory in Explorer or file via its dedicated viewer/player/editor/installer) when 1 bookmark is saved, or opens a dedicated Modal Bottom Sheet in both Material and MIUIX themes to manage and open multiple bookmarks with dynamic file type icons and instant un-bookmark options.
 - **2-Column Grid for Quick Access (ShortcutList)**:
   - Restructured quick access shortcuts (Bluetooth, Downloads, WhatsApp, Telegram, etc.) into a clean 2-column grid of horizontal cards with icons on the left and text labels on the right.
 - **Floating Capsule Navigation Bar**:

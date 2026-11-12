@@ -10,8 +10,14 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Send
+import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.outlined.*
+import androidx.compose.material3.BottomSheetDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.*
+import kotlinx.coroutines.launch
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -203,6 +209,7 @@ fun MiuixHomeScreen(navController: NavController, viewModel: HomeViewModel) {
  * 3. Modern Storage Card (Phone storage with gauge + Root privileged storage)
  * 4. Sources Section (Camera, Screenshots, Messaging shortcuts)
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MiuixFilesContent(
     viewModel: HomeViewModel,
@@ -211,8 +218,10 @@ fun MiuixFilesContent(
     isDark: Boolean
 ) {
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
     val bookmarksManager = remember { BookmarksManager(context) }
     val bookmarks by bookmarksManager.bookmarks.collectAsState(initial = emptyList())
+    var showBookmarksSheet by remember { mutableStateOf(false) }
 
     val cardColor = if (isDark) Color(0xFF161618) else Color.White
     val cardBorderColor = if (isDark) Color(0xFF242428) else Color(0xFFE5E7EB)
@@ -388,10 +397,16 @@ fun MiuixFilesContent(
                     primaryTextColor = primaryTextColor,
                     secondaryTextColor = secondaryTextColor,
                     onClick = {
-                        if (bookmarks.isNotEmpty()) {
-                            navController.navigate("explorer/${Uri.encode(bookmarks.first().path)}")
-                        } else {
-                            navController.navigate("explorer/${Uri.encode(externalStorage)}")
+                        when {
+                            bookmarks.isEmpty() -> {
+                                navController.navigate("explorer/${Uri.encode(externalStorage)}")
+                            }
+                            bookmarks.size == 1 -> {
+                                openBookmarkItem(context, bookmarks.first(), navController)
+                            }
+                            else -> {
+                                showBookmarksSheet = true
+                            }
                         }
                     }
                 )
@@ -567,6 +582,157 @@ fun MiuixFilesContent(
                             secondaryTextColor = secondaryTextColor,
                             onClick = { navController.navigate("explorer/${Uri.encode(shortcut.path)}") }
                         )
+                    }
+                }
+            }
+        }
+
+        if (showBookmarksSheet && bookmarks.isNotEmpty()) {
+            ModalBottomSheet(
+                onDismissRequest = { showBookmarksSheet = false },
+                containerColor = if (isDark) Color(0xFF1C1C1E) else Color.White,
+                dragHandle = { BottomSheetDefaults.DragHandle() },
+                shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp)
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 20.dp)
+                        .padding(bottom = 32.dp)
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 16.dp)
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(10.dp)
+                        ) {
+                            androidx.compose.material3.Icon(
+                                imageVector = Icons.Filled.Bookmark,
+                                contentDescription = null,
+                                tint = Color(0xFFF43F5E),
+                                modifier = Modifier.size(24.dp)
+                            )
+                            androidx.compose.material3.Text(
+                                text = stringResource(R.string.home_favorites),
+                                style = androidx.compose.material3.MaterialTheme.typography.titleLarge,
+                                fontWeight = FontWeight.Bold,
+                                color = primaryTextColor
+                            )
+                        }
+
+                        Surface(
+                            color = Color(0xFFF43F5E).copy(alpha = 0.15f),
+                            shape = CircleShape
+                        ) {
+                            androidx.compose.material3.Text(
+                                text = stringResource(R.string.home_favorites_count, bookmarks.size),
+                                style = androidx.compose.material3.MaterialTheme.typography.labelSmall,
+                                color = Color(0xFFF43F5E),
+                                fontWeight = FontWeight.SemiBold,
+                                modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
+                            )
+                        }
+                    }
+
+                    androidx.compose.foundation.lazy.LazyColumn(
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        items(bookmarks, key = { it.path }) { bookmark ->
+                            val actualFile = remember(bookmark.path) { java.io.File(bookmark.path) }
+                            val isDir = actualFile.isDirectory || (!actualFile.exists() && !bookmark.name.contains("."))
+                            val icon = remember(bookmark.name, isDir) { getBookmarkItemIcon(bookmark.name, isDir) }
+                            val subtitle = if (isDir) {
+                                bookmark.path
+                            } else {
+                                if (actualFile.exists()) {
+                                    "${actualFile.length().humanReadable()} • ${bookmark.path}"
+                                } else {
+                                    bookmark.path
+                                }
+                            }
+
+                            Surface(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clip(RoundedCornerShape(16.dp))
+                                    .clickable {
+                                        showBookmarksSheet = false
+                                        openBookmarkItem(context, bookmark, navController)
+                                    },
+                                color = if (isDark) Color(0xFF242428) else Color(0xFFF3F4F6),
+                                shape = RoundedCornerShape(16.dp)
+                            ) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 14.dp, vertical = 12.dp)
+                                ) {
+                                    Surface(
+                                        color = if (isDir) miuixBlue.copy(alpha = 0.15f) else Color(0xFFF43F5E).copy(alpha = 0.15f),
+                                        shape = RoundedCornerShape(12.dp),
+                                        modifier = Modifier.size(40.dp)
+                                    ) {
+                                        Box(
+                                            contentAlignment = Alignment.Center,
+                                            modifier = Modifier.fillMaxSize()
+                                        ) {
+                                            androidx.compose.material3.Icon(
+                                                imageVector = icon,
+                                                contentDescription = null,
+                                                tint = if (isDir) miuixBlue else Color(0xFFF43F5E),
+                                                modifier = Modifier.size(22.dp)
+                                            )
+                                        }
+                                    }
+
+                                    Spacer(Modifier.width(14.dp))
+
+                                    Column(modifier = Modifier.weight(1f)) {
+                                        androidx.compose.material3.Text(
+                                            text = bookmark.name,
+                                            style = androidx.compose.material3.MaterialTheme.typography.titleSmall,
+                                            fontWeight = FontWeight.Bold,
+                                            color = primaryTextColor,
+                                            maxLines = 1,
+                                            overflow = TextOverflow.Ellipsis
+                                        )
+                                        Spacer(Modifier.height(2.dp))
+                                        androidx.compose.material3.Text(
+                                            text = subtitle,
+                                            style = androidx.compose.material3.MaterialTheme.typography.bodySmall,
+                                            color = secondaryTextColor,
+                                            maxLines = 1,
+                                            overflow = TextOverflow.Ellipsis
+                                        )
+                                    }
+
+                                    IconButton(
+                                        onClick = {
+                                            scope.launch {
+                                                bookmarksManager.removeBookmark(bookmark.path)
+                                                if (bookmarks.size <= 1) {
+                                                    showBookmarksSheet = false
+                                                }
+                                            }
+                                        }
+                                    ) {
+                                        androidx.compose.material3.Icon(
+                                            imageVector = Icons.Outlined.Delete,
+                                            contentDescription = "Hapus bookmark",
+                                            tint = Color(0xFFEF4444),
+                                            modifier = Modifier.size(20.dp)
+                                        )
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }

@@ -99,8 +99,8 @@
     <string name="home_camera_desc">Foto &amp; rekaman kamera</string>
     <string name="home_screenshots">Screenshot &amp; rekaman layar</string>
     <string name="home_screenshots_desc">Tangkapan layar perangkat</string>
-    <string name="home_favorites_count">%1$d folder ditandai</string>
-    <string name="home_favorites_empty">Belum ada folder ditandai</string>
+    <string name="home_favorites_count">%1$d item ditandai</string>
+    <string name="home_favorites_empty">Belum ada item ditandai</string>
     <string name="home_cat_doc">Dok</string>
     <string name="home_cat_image">Gambar</string>
     <string name="home_cat_video">Video</string>
