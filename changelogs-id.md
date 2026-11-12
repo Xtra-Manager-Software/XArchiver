@@ -26,6 +26,10 @@ Semua perubahan penting pada XArchiver akan didokumentasikan dalam berkas ini.
   - **MIUIX HyperOS (`MiuixFolderPickerBottomSheet`)**: Meniru gaya pengelola berkas bawaan HyperOS dengan sudut melengkung 24dp, pegangan kapsul mini, kontainer ikon folder amber hangat, dan tombol aksi kapsul khas MIUIX.
 - **Penyelarasan Ikon Folder Solid Amber Hangat di Seluruh Layar MIUIX**:
   - Mengganti ikon garis luar tipis (`MiuixIcons.Folder`) dengan ikon folder terisi padat yang kaya (`Icons.Default.Folder`) berpalet Amber Gold khas HyperOS (`#F59E0B`) dengan latar squircle transparan lembut pada daftar berkas MIUIX Explorer dan status folder kosong.
+- **Paritas Fitur Tab Terbaru (Recent) MIUIX Bergaya HyperOS**:
+  - Menyamakan fitur tab Terbaru antara Material dan MIUIX (`MiuixRecentContent`): kartu kelompok folder/sumber (Kamera, Tangkapan Layar, Unduhan, WhatsApp, Gambar, dll.) lengkap dengan header interaktif untuk membuka folder langsung.
+  - Baris pratinjau thumbnail media horizontal (`LazyRow`) untuk kelompok foto/video dengan overlay pemutar video serta pembukaan berkas instan via `openRecentItem`.
+  - Kartu daftar berkas campuran (dokumen, arsip, APK) dengan badge squircle tipe berkas dan pembukaan langsung.
 - **Navigasi Partisi & Hierarki Folder Bertingkat**:
   - Pemilih partisi penyimpanan (Penyimpanan Internal, Kartu SD, Root) lengkap dengan informasi kapasitas sisa serta pintasan kartu "Folder Saat Ini".
   - Penjelajahan folder mendalam dengan panah kembali serta integrasi gestur kembali sistem Android (`BackHandler`) yang menaikkan tingkat folder tanpa menutup bottom sheet secara tiba-tiba.

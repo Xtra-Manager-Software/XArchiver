@@ -1059,7 +1059,7 @@ private fun SectionHeader(
 
 private val EaseOutCubic = CubicBezierEasing(0.33f, 1f, 0.68f, 1f)
 
-private fun openRecentItem(context: Context, file: FileItem, navController: NavController) {
+internal fun openRecentItem(context: Context, file: FileItem, navController: NavController) {
     val actualFile = java.io.File(file.path)
     if (!actualFile.exists()) return
     

@@ -26,6 +26,10 @@ All notable changes to XArchiver will be documented in this file.
   - **MIUIX HyperOS (`MiuixFolderPickerBottomSheet`)**: Styled with HyperOS file manager aesthetics, 24dp rounded corners, centered pill drag handle, warm amber folder squircle containers, and MIUIX vibrant pill action buttons.
 - **Unified Warm Amber Solid Folder Icon across MIUIX Explorer & Home**:
   - Replaced the thin outline folder icon (`MiuixIcons.Folder`) with the rich solid filled folder icon (`Icons.Default.Folder`) in vibrant Amber Gold (`#F59E0B`) with a soft translucent squircle container backdrop across MIUIX Explorer file lists and empty folder state.
+- **MIUIX Recent Tab Feature Parity with HyperOS Aesthetic**:
+  - Brought complete feature parity from Material to the MIUIX Recent tab (`MiuixRecentContent`): folder/source bucket cards (Camera, Screenshots, Downloads, WhatsApp, Pictures, etc.) with clickable headers navigating to the folder.
+  - Horizontal media thumbnail preview row (`LazyRow`) for image/video groups with play button overlay and instant file opening via `openRecentItem`.
+  - Rich document/archive/APK mixed list cards with file type squircle badges and instant file execution.
 - **Hierarchical Storage & Subfolder Navigation**:
   - Partition selector (Internal Storage, SD Card, Root) with available space breakdown and a "Current Folder" fast-jump card.
   - Deep folder traversal with back arrow navigation and Android system back gesture (`BackHandler`) integration that steps up folder levels instead of abruptly closing the sheet.

@@ -9,14 +9,17 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.*
 import androidx.compose.material.icons.automirrored.outlined.Send
-import androidx.compose.material.icons.filled.Bookmark
-import androidx.compose.material.icons.filled.Folder
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.BottomSheetDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.runtime.*
 import kotlinx.coroutines.launch
 import androidx.compose.ui.Alignment
@@ -971,14 +974,17 @@ fun MiuixStorageRow(
 }
 
 /**
- * Recent tab content showing recent files grouped by timeline.
+ * Recent tab content showing recent files grouped by folder/source buckets,
+ * matching Material feature parity with authentic MIUIX HyperOS styling.
  */
 @Composable
 fun MiuixRecentContent(viewModel: HomeViewModel, navController: NavController, isDark: Boolean) {
+    val context = LocalContext.current
     val recentFiles = viewModel.recentFilesGrouped.value
+    val isLoading = viewModel.isLoadingRecent.value
     val cardColor = if (isDark) Color(0xFF161618) else Color.White
     val cardBorderColor = if (isDark) Color(0xFF242428) else Color(0xFFE5E7EB)
-    val dividerColor = if (isDark) Color(0xFF222226) else Color(0xFFF0F1F4)
+    val itemBgColor = if (isDark) Color(0xFF202024) else Color(0xFFF4F5F7)
     val primaryTextColor = if (isDark) Color.White else Color(0xFF111827)
     val secondaryTextColor = if (isDark) Color(0xFF8E8E93) else Color(0xFF6B7280)
     val miuixBlue = Color(0xFF0070F0)
@@ -1000,66 +1006,294 @@ fun MiuixRecentContent(viewModel: HomeViewModel, navController: NavController, i
         modifier = Modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(14.dp)
     ) {
-        if (recentFiles.isEmpty()) {
+        if (isLoading) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(64.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator(color = miuixBlue)
+            }
+        } else if (recentFiles.isEmpty()) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(48.dp),
                 contentAlignment = Alignment.Center
             ) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    androidx.compose.material3.Icon(
-                        imageVector = MiuixIcons.Recent,
-                        contentDescription = null,
-                        tint = secondaryTextColor.copy(alpha = 0.5f),
-                        modifier = Modifier.size(40.dp)
-                    )
-                    Spacer(modifier = Modifier.height(10.dp))
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Surface(
+                        shape = CircleShape,
+                        color = miuixBlue.copy(alpha = if (isDark) 0.15f else 0.08f),
+                        modifier = Modifier.size(80.dp)
+                    ) {
+                        Box(contentAlignment = Alignment.Center) {
+                            androidx.compose.material3.Icon(
+                                imageVector = MiuixIcons.Recent,
+                                contentDescription = null,
+                                tint = miuixBlue,
+                                modifier = Modifier.size(38.dp)
+                            )
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(16.dp))
                     Text(
-                        text = "Tidak ada berkas terbaru",
+                        text = stringResource(R.string.recent_empty),
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = primaryTextColor
+                    )
+                    Spacer(modifier = Modifier.height(6.dp))
+                    Text(
+                        text = stringResource(R.string.recent_empty_desc),
+                        fontSize = 13.sp,
                         color = secondaryTextColor,
-                        fontSize = 14.sp
+                        textAlign = androidx.compose.ui.text.style.TextAlign.Center
                     )
                 }
             }
         } else {
-            recentFiles.forEach { (group, items) ->
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalArrangement = Arrangement.spacedBy(6.dp)
+            Text(
+                text = stringResource(R.string.recent_today),
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold,
+                color = primaryTextColor,
+                modifier = Modifier.padding(start = 4.dp, bottom = 2.dp)
+            )
+
+            recentFiles.forEach { (group, files) ->
+                Surface(
+                    modifier = cardModifier,
+                    color = cardColor,
+                    shape = RoundedCornerShape(20.dp)
                 ) {
-                    Text(
-                        text = group,
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = secondaryTextColor,
-                        modifier = Modifier.padding(start = 6.dp, top = 2.dp)
-                    )
-                    Surface(
-                        modifier = cardModifier,
-                        color = cardColor,
-                        shape = RoundedCornerShape(20.dp)
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp)
                     ) {
-                        Column(modifier = Modifier.fillMaxWidth()) {
-                            items.forEachIndexed { index, file ->
-                                if (index > 0) {
-                                    HorizontalDivider(
-                                        modifier = Modifier.padding(horizontal = 16.dp),
-                                        color = dividerColor,
-                                        thickness = 0.5.dp
+                        // Bucket Folder Header
+                        val parentDir = files.firstOrNull()?.let { File(it.path).parent }
+                        val (headerIcon, headerTint) = when {
+                            group.contains("tangkapan layar", ignoreCase = true) || group.contains("screenshot", ignoreCase = true) ->
+                                Pair(Icons.Filled.PhotoLibrary, Color(0xFF8B5CF6))
+                            group.contains("kamera", ignoreCase = true) || group.contains("camera", ignoreCase = true) ->
+                                Pair(Icons.Filled.CameraAlt, miuixBlue)
+                            group.contains("pictures", ignoreCase = true) || group.contains("gambar", ignoreCase = true) ->
+                                Pair(Icons.Filled.Image, Color(0xFF06B6D4))
+                            group.contains("download", ignoreCase = true) || group.contains("unduhan", ignoreCase = true) ->
+                                Pair(Icons.Filled.Download, Color(0xFF10B981))
+                            group.contains("whatsapp", ignoreCase = true) ->
+                                Pair(Icons.AutoMirrored.Filled.Chat, Color(0xFF22C55E))
+                            else ->
+                                Pair(Icons.Filled.Folder, Color(0xFFF59E0B))
+                        }
+
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clip(RoundedCornerShape(10.dp))
+                                .clickable {
+                                    if (parentDir != null) {
+                                        navController.navigate("explorer/${Uri.encode(parentDir)}")
+                                    }
+                                }
+                                .padding(vertical = 4.dp)
+                        ) {
+                            Surface(
+                                color = headerTint.copy(alpha = 0.15f),
+                                shape = RoundedCornerShape(11.dp),
+                                modifier = Modifier.size(36.dp)
+                            ) {
+                                Box(contentAlignment = Alignment.Center) {
+                                    androidx.compose.material3.Icon(
+                                        imageVector = headerIcon,
+                                        contentDescription = null,
+                                        tint = headerTint,
+                                        modifier = Modifier.size(20.dp)
                                     )
                                 }
-                                MiuixActionRow(
-                                    title = file.name,
-                                    subtitle = file.path,
-                                    icon = if (file.isDirectory) Icons.Default.Folder else MiuixIcons.File,
-                                    iconTint = if (file.isDirectory) Color(0xFFF59E0B) else miuixBlue,
-                                    primaryTextColor = primaryTextColor,
-                                    secondaryTextColor = secondaryTextColor,
-                                    onClick = {
-                                        navController.navigate("explorer/${Uri.encode(File(file.path).parent ?: "/sdcard")}")
-                                    }
+                            }
+
+                            Spacer(modifier = Modifier.width(12.dp))
+
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(
+                                    text = group,
+                                    fontSize = 16.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = primaryTextColor
                                 )
+                                Text(
+                                    text = "${files.size} item",
+                                    fontSize = 12.sp,
+                                    color = secondaryTextColor
+                                )
+                            }
+
+                            androidx.compose.material3.Icon(
+                                imageVector = MiuixIcons.ChevronForward,
+                                contentDescription = null,
+                                tint = secondaryTextColor.copy(alpha = 0.6f),
+                                modifier = Modifier.size(18.dp)
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(14.dp))
+
+                        val allMedia = files.all { f ->
+                            val lower = f.name.lowercase()
+                            lower.endsWith(".jpg") || lower.endsWith(".png") || lower.endsWith(".jpeg") || lower.endsWith(".webp") || lower.endsWith(".gif") || lower.endsWith(".mp4")
+                        }
+
+                        if (allMedia) {
+                            // Horizontal thumbnail preview row
+                            LazyRow(
+                                horizontalArrangement = Arrangement.spacedBy(10.dp)
+                            ) {
+                                items(files.size) { index ->
+                                    val file = files[index]
+                                    val isVideo = file.name.lowercase().endsWith(".mp4")
+                                    Box(
+                                        modifier = Modifier
+                                            .size(104.dp)
+                                            .clip(RoundedCornerShape(14.dp))
+                                            .background(if (isDark) Color(0xFF222226) else Color(0xFFF3F4F6))
+                                            .clickable {
+                                                openRecentItem(context, file, navController)
+                                            }
+                                    ) {
+                                        androidx.compose.foundation.Image(
+                                            painter = coil.compose.rememberAsyncImagePainter(File(file.path)),
+                                            contentDescription = file.name,
+                                            modifier = Modifier.fillMaxSize(),
+                                            contentScale = ContentScale.Crop
+                                        )
+                                        if (isVideo) {
+                                            Box(
+                                                modifier = Modifier.fillMaxSize(),
+                                                contentAlignment = Alignment.Center
+                                            ) {
+                                                Surface(
+                                                    shape = CircleShape,
+                                                    color = Color.Black.copy(alpha = 0.55f),
+                                                    modifier = Modifier.size(30.dp)
+                                                ) {
+                                                    Box(contentAlignment = Alignment.Center) {
+                                                        androidx.compose.material3.Icon(
+                                                            Icons.Filled.PlayArrow,
+                                                            contentDescription = null,
+                                                            tint = Color.White,
+                                                            modifier = Modifier.size(18.dp)
+                                                        )
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        } else {
+                            // Document / Mixed item list
+                            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                                files.take(4).forEach { file ->
+                                    val isDir = file.isDirectory
+                                    val isApk = file.name.endsWith(".apk", ignoreCase = true)
+                                    val isArchive = file.name.lowercase().let {
+                                        it.endsWith(".zip") || it.endsWith(".rar") || it.endsWith(".7z") || it.endsWith(".tar") || it.endsWith(".gz")
+                                    }
+                                    val isImage = file.name.lowercase().let {
+                                        it.endsWith(".jpg") || it.endsWith(".png") || it.endsWith(".jpeg") || it.endsWith(".webp") || it.endsWith(".gif")
+                                    }
+
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .clip(RoundedCornerShape(12.dp))
+                                            .background(itemBgColor)
+                                            .clickable {
+                                                openRecentItem(context, file, navController)
+                                            }
+                                            .padding(horizontal = 12.dp, vertical = 10.dp),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        // Icon Box
+                                        Box(
+                                            modifier = Modifier
+                                                .size(42.dp)
+                                                .clip(RoundedCornerShape(10.dp))
+                                            .background(
+                                                when {
+                                                    isDir -> Color(0xFFF59E0B).copy(alpha = 0.15f)
+                                                    isApk -> Color(0xFF4CAF50).copy(alpha = 0.15f)
+                                                    isArchive -> Color(0xFFFF9800).copy(alpha = 0.15f)
+                                                    isImage -> Color(0xFF03A9F4).copy(alpha = 0.15f)
+                                                    else -> miuixBlue.copy(alpha = 0.15f)
+                                                }
+                                            ),
+                                            contentAlignment = Alignment.Center
+                                        ) {
+                                            when {
+                                                isImage -> {
+                                                    androidx.compose.foundation.Image(
+                                                        painter = coil.compose.rememberAsyncImagePainter(File(file.path)),
+                                                        contentDescription = null,
+                                                        modifier = Modifier.fillMaxSize(),
+                                                        contentScale = ContentScale.Crop
+                                                    )
+                                                }
+                                                isDir -> androidx.compose.material3.Icon(
+                                                    Icons.Filled.Folder,
+                                                    contentDescription = null,
+                                                    tint = Color(0xFFF59E0B),
+                                                    modifier = Modifier.size(22.dp)
+                                                )
+                                                isApk -> androidx.compose.material3.Icon(
+                                                    Icons.Filled.Android,
+                                                    contentDescription = null,
+                                                    tint = Color(0xFF4CAF50),
+                                                    modifier = Modifier.size(22.dp)
+                                                )
+                                                isArchive -> androidx.compose.material3.Icon(
+                                                    Icons.Filled.Archive,
+                                                    contentDescription = null,
+                                                    tint = Color(0xFFFF9800),
+                                                    modifier = Modifier.size(22.dp)
+                                                )
+                                                else -> androidx.compose.material3.Icon(
+                                                    Icons.AutoMirrored.Filled.InsertDriveFile,
+                                                    contentDescription = null,
+                                                    tint = miuixBlue,
+                                                    modifier = Modifier.size(22.dp)
+                                                )
+                                            }
+                                        }
+
+                                        Spacer(modifier = Modifier.width(12.dp))
+
+                                        Column(modifier = Modifier.weight(1f)) {
+                                            Text(
+                                                text = file.name,
+                                                fontSize = 14.sp,
+                                                fontWeight = FontWeight.SemiBold,
+                                                color = primaryTextColor,
+                                                maxLines = 1,
+                                                overflow = TextOverflow.Ellipsis
+                                            )
+                                            Spacer(modifier = Modifier.height(2.dp))
+                                            Text(
+                                                text = if (isDir) "Folder" else file.size.humanReadable(),
+                                                fontSize = 12.sp,
+                                                color = secondaryTextColor
+                                            )
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
