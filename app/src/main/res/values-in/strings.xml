@@ -46,6 +46,21 @@
     <string name="action_create">Buat</string>
     <string name="action_extract">Ekstrak</string>
     <string name="action_open">Buka</string>
+    <string name="action_copy">Salin</string>
+    <string name="action_cut">Potong</string>
+    <string name="action_delete">Hapus</string>
+    <string name="action_compress">Kompres</string>
+    <string name="action_share">Bagikan</string>
+    <string name="action_rename">Ganti nama</string>
+    <string name="action_properties">Properti</string>
+    <string name="action_details">Rincian</string>
+    <string name="action_bookmark">Tambah Bookmark</string>
+    <string name="action_favorite">Favoritkan</string>
+    <string name="action_open_archive">Buka Arsip</string>
+    <string name="action_paste">Tempel</string>
+    <string name="clipboard_items_selected">%1$d item dipilih</string>
+    <string name="clipboard_ready_to_move">Siap dipindahkan ke sini</string>
+    <string name="clipboard_ready_to_copy">Siap disalin ke sini</string>
 
     <!-- Create Archive Dialog -->
     <string name="archive_create_title">Buat Arsip</string>

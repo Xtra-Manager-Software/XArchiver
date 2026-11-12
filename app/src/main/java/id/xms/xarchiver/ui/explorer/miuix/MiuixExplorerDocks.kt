@@ -86,48 +86,76 @@ fun MiuixSelectionDock(
             horizontalArrangement = Arrangement.SpaceEvenly,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            MiuixDockAction(icon = Icons.Default.ContentCopy, label = "Salin", onClick = onCopy)
-            MiuixDockAction(icon = Icons.Default.ContentCut, label = "Potong", onClick = onCut)
-            MiuixDockAction(icon = Icons.Default.Delete, label = "Hapus", tint = Color(0xFFEF4444), onClick = onDelete)
+            MiuixDockAction(
+                icon = Icons.Default.ContentCopy,
+                label = stringResource(R.string.action_copy),
+                onClick = onCopy
+            )
+            MiuixDockAction(
+                icon = Icons.Default.ContentCut,
+                label = stringResource(R.string.action_cut),
+                onClick = onCut
+            )
+            MiuixDockAction(
+                icon = Icons.Default.Delete,
+                label = stringResource(R.string.action_delete),
+                tint = Color(0xFFEF4444),
+                onClick = onDelete
+            )
             if (hasArchives) {
-                MiuixDockAction(icon = Icons.Default.Unarchive, label = "Ekstrak", onClick = onExtractOrShare)
-            } else {
-                MiuixDockAction(icon = Icons.Default.Share, label = "Bagikan", onClick = onExtractOrShare)
+                MiuixDockAction(
+                    icon = Icons.Default.Unarchive,
+                    label = stringResource(R.string.action_extract),
+                    onClick = onExtractOrShare
+                )
             }
-            MiuixDockAction(icon = Icons.Default.FolderZip, label = "Kompres", onClick = onCompress)
+            MiuixDockAction(
+                icon = Icons.Default.FolderZip,
+                label = stringResource(R.string.action_compress),
+                onClick = onCompress
+            )
 
-            val moreItems = remember(selectedCount, onOpenArchive, onRename, onProperties, onBookmark, onShare) {
+            val renameLabel = stringResource(R.string.action_rename)
+            val detailsLabel = stringResource(R.string.action_details)
+            val favoriteLabel = stringResource(R.string.action_favorite)
+            val shareLabel = stringResource(R.string.action_share)
+            val openArchiveLabel = stringResource(R.string.action_open_archive)
+
+            val moreItems = remember(
+                selectedCount, onOpenArchive, onRename, onProperties, onBookmark, onShare,
+                renameLabel, detailsLabel, favoriteLabel, shareLabel, openArchiveLabel
+            ) {
                 buildList {
                     if (selectedCount == 1) {
                         add(
                             DropdownItem(
-                                text = "Ganti Nama",
+                                text = renameLabel,
                                 onClick = onRename
                             )
                         )
                         add(
                             DropdownItem(
-                                text = "Properti",
+                                text = detailsLabel,
                                 onClick = onProperties
                             )
                         )
                         add(
                             DropdownItem(
-                                text = "Tambah Bookmark",
+                                text = favoriteLabel,
                                 onClick = onBookmark
                             )
                         )
                     }
                     add(
                         DropdownItem(
-                            text = "Bagikan",
+                            text = shareLabel,
                             onClick = onShare
                         )
                     )
                     if (onOpenArchive != null) {
                         add(
                             DropdownItem(
-                                text = "Buka Arsip",
+                                text = openArchiveLabel,
                                 onClick = onOpenArchive
                             )
                         )
@@ -146,6 +174,7 @@ fun MiuixSelectionDock(
             CompositionLocalProvider(
                 LocalNavigationEventDispatcherOwner provides dispatcherOwner
             ) {
+                val moreActionLabel = stringResource(R.string.explorer_action_more)
                 WindowIconDropdownMenu(
                     entry = DropdownEntry(items = moreItems),
                     backgroundColor = Color.Transparent,
@@ -186,14 +215,14 @@ fun MiuixSelectionDock(
                         ) {
                             Icon(
                                 imageVector = Icons.Default.MoreHoriz,
-                                contentDescription = "Lainnya",
+                                contentDescription = moreActionLabel,
                                 tint = MiuixTheme.colorScheme.onSurface,
                                 modifier = Modifier.size(16.dp)
                             )
                         }
                         Spacer(Modifier.height(3.dp))
                         Text(
-                            text = "Lainnya",
+                            text = moreActionLabel,
                             color = MiuixTheme.colorScheme.onSurface,
                             fontSize = 10.sp,
                             fontWeight = FontWeight.Medium
@@ -292,12 +321,16 @@ fun MiuixClipboardDock(
         ) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = "$clipboardCount item dipilih",
+                    text = stringResource(R.string.clipboard_items_selected, clipboardCount),
                     fontWeight = FontWeight.Bold,
                     fontSize = 14.sp
                 )
                 Text(
-                    text = if (isCut) "Siap dipindahkan ke sini" else "Siap disalin ke sini",
+                    text = if (isCut) {
+                        stringResource(R.string.clipboard_ready_to_move)
+                    } else {
+                        stringResource(R.string.clipboard_ready_to_copy)
+                    },
                     fontSize = 12.sp,
                     color = if (isDark) Color(0xFF8E8E93) else Color(0xFF6B7280)
                 )
@@ -311,7 +344,7 @@ fun MiuixClipboardDock(
                         contentColor = if (isDark) Color.White else Color(0xFF1F2937)
                     )
                 ) {
-                    Text("Batal")
+                    Text(stringResource(R.string.action_cancel))
                 }
 
                 Button(
@@ -324,7 +357,7 @@ fun MiuixClipboardDock(
                         modifier = Modifier.size(16.dp).padding(end = 4.dp),
                         tint = Color.White
                     )
-                    Text("Tempel")
+                    Text(stringResource(R.string.action_paste))
                 }
             }
         }

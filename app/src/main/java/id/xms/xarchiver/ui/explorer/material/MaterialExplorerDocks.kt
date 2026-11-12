@@ -12,8 +12,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import id.xms.xarchiver.R
 
 /**
  * Bottom action dock during selection mode using Material Monet theme tokens.
@@ -50,46 +52,39 @@ fun MaterialSelectionDock(
         ) {
             MaterialBottomActionButton(
                 icon = Icons.Default.ContentCopy,
-                label = "Salin",
+                label = stringResource(R.string.action_copy),
                 tint = contentColor,
                 onClick = onCopy
             )
             MaterialBottomActionButton(
                 icon = Icons.Default.ContentCut,
-                label = "Potong",
+                label = stringResource(R.string.action_cut),
                 tint = contentColor,
                 onClick = onCut
             )
             MaterialBottomActionButton(
                 icon = Icons.Default.Delete,
-                label = "Hapus",
+                label = stringResource(R.string.action_delete),
                 tint = errorColor,
                 onClick = onDelete
             )
             if (hasArchives) {
                 MaterialBottomActionButton(
                     icon = Icons.Default.Unarchive,
-                    label = "Ekstrak",
-                    tint = contentColor,
-                    onClick = onExtractOrShare
-                )
-            } else {
-                MaterialBottomActionButton(
-                    icon = Icons.Default.Share,
-                    label = "Bagikan",
+                    label = stringResource(R.string.action_extract),
                     tint = contentColor,
                     onClick = onExtractOrShare
                 )
             }
             MaterialBottomActionButton(
                 icon = Icons.Default.FolderZip,
-                label = "Kompres",
+                label = stringResource(R.string.action_compress),
                 tint = contentColor,
                 onClick = onCompress
             )
             MaterialBottomActionButton(
                 icon = Icons.Default.MoreHoriz,
-                label = "Lainnya",
+                label = stringResource(R.string.explorer_action_more),
                 tint = contentColor,
                 onClick = onMore
             )

@@ -46,6 +46,21 @@
     <string name="action_create">Create</string>
     <string name="action_extract">Extract</string>
     <string name="action_open">Open</string>
+    <string name="action_copy">Copy</string>
+    <string name="action_cut">Cut</string>
+    <string name="action_delete">Delete</string>
+    <string name="action_compress">Compress</string>
+    <string name="action_share">Share</string>
+    <string name="action_rename">Rename</string>
+    <string name="action_properties">Properties</string>
+    <string name="action_details">Details</string>
+    <string name="action_bookmark">Add Bookmark</string>
+    <string name="action_favorite">Favorite</string>
+    <string name="action_open_archive">Open Archive</string>
+    <string name="action_paste">Paste</string>
+    <string name="clipboard_items_selected">%1$d item selected</string>
+    <string name="clipboard_ready_to_move">Ready to move here</string>
+    <string name="clipboard_ready_to_copy">Ready to copy here</string>
 
     <!-- Create Archive Dialog -->
     <string name="archive_create_title">Create Archive</string>

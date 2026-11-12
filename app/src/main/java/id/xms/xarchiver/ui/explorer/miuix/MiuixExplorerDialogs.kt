@@ -214,7 +214,7 @@ fun MiuixDeleteConfirmDialog(
                         modifier = Modifier.weight(1f).height(46.dp),
                         colors = ButtonDefaults.buttonColors(color = deleteColor, contentColor = Color.White)
                     ) {
-                        Text("Hapus")
+                        Text(stringResource(R.string.action_delete))
                     }
                 }
             }
@@ -561,7 +561,7 @@ fun MiuixSelectionMoreBottomSheet(
     ) {
         Column(modifier = Modifier.fillMaxWidth().padding(bottom = 32.dp)) {
             Text(
-                text = "$selectedCount item dipilih",
+                text = stringResource(R.string.clipboard_items_selected, selectedCount),
                 fontSize = 17.sp,
                 fontWeight = FontWeight.Bold,
                 color = primaryTextColor,
@@ -571,15 +571,15 @@ fun MiuixSelectionMoreBottomSheet(
             HorizontalDivider(color = dividerColor, thickness = 0.5.dp)
 
             if (selectedCount == 1) {
-                MiuixBottomSheetRow(Icons.Default.Edit, "Ganti Nama", primaryTextColor, onRename)
-                MiuixBottomSheetRow(Icons.Default.Info, "Properti", primaryTextColor, onProperties)
-                MiuixBottomSheetRow(Icons.Default.Bookmark, "Tambah Bookmark", primaryTextColor, onBookmark)
+                MiuixBottomSheetRow(Icons.Default.Edit, stringResource(R.string.action_rename), primaryTextColor, onRename)
+                MiuixBottomSheetRow(Icons.Default.Info, stringResource(R.string.action_details), primaryTextColor, onProperties)
+                MiuixBottomSheetRow(Icons.Default.Bookmark, stringResource(R.string.action_favorite), primaryTextColor, onBookmark)
             }
 
-            MiuixBottomSheetRow(Icons.Default.Share, "Bagikan", primaryTextColor, onShare)
+            MiuixBottomSheetRow(Icons.Default.Share, stringResource(R.string.action_share), primaryTextColor, onShare)
 
             onExtract?.let {
-                MiuixBottomSheetRow(Icons.Default.FolderZip, "Buka Arsip", primaryTextColor, it)
+                MiuixBottomSheetRow(Icons.Default.FolderZip, stringResource(R.string.action_open_archive), primaryTextColor, it)
             }
         }
     }

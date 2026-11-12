@@ -687,7 +687,7 @@ fun MaterialSelectionBottomSheet(
                 .padding(bottom = 32.dp, top = 8.dp)
         ) {
             Text(
-                text = "$selectedCount item${if (selectedCount > 1) "s" else ""} selected",
+                text = stringResource(R.string.clipboard_items_selected, selectedCount),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp)
@@ -695,15 +695,15 @@ fun MaterialSelectionBottomSheet(
             HorizontalDivider(Modifier.padding(vertical = 8.dp))
 
             if (selectedCount == 1) {
-                MaterialBottomSheetAction(Icons.Default.Edit, "Rename", onRename)
-                MaterialBottomSheetAction(Icons.Default.Info, "Properties", onProperties)
-                MaterialBottomSheetAction(Icons.Default.Bookmark, "Bookmark", onBookmark)
+                MaterialBottomSheetAction(Icons.Default.Edit, stringResource(R.string.action_rename), onRename)
+                MaterialBottomSheetAction(Icons.Default.Info, stringResource(R.string.action_properties), onProperties)
+                MaterialBottomSheetAction(Icons.Default.Bookmark, stringResource(R.string.action_bookmark), onBookmark)
             }
 
-            MaterialBottomSheetAction(Icons.Default.Share, "Share", onShare)
+            MaterialBottomSheetAction(Icons.Default.Share, stringResource(R.string.action_share), onShare)
 
             onExtract?.let {
-                MaterialBottomSheetAction(Icons.Default.FolderZip, "Open Archive", it)
+                MaterialBottomSheetAction(Icons.Default.FolderZip, stringResource(R.string.action_open_archive), it)
             }
         }
     }
