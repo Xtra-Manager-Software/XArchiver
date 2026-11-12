@@ -315,17 +315,18 @@ fun MiuixEmptyFolderState(
             .padding(vertical = 72.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        val emptyColor = if (isSearch) primaryColor else Color(0xFFF59E0B)
         Box(
             modifier = Modifier
                 .size(100.dp)
                 .clip(CircleShape)
-                .background(primaryColor.copy(alpha = if (isDark) 0.15f else 0.08f)),
+                .background(emptyColor.copy(alpha = if (isDark) 0.15f else 0.08f)),
             contentAlignment = Alignment.Center
         ) {
             Icon(
-                imageVector = if (isSearch) Icons.Default.SearchOff else MiuixIcons.Folder,
+                imageVector = if (isSearch) Icons.Default.SearchOff else Icons.Default.FolderOpen,
                 contentDescription = null,
-                tint = primaryColor,
+                tint = emptyColor,
                 modifier = Modifier.size(48.dp)
             )
         }
@@ -367,7 +368,7 @@ fun formatFileSizeMiuix(size: Long): String {
 }
 
 fun getFileIconMiuix(file: FileItem): ImageVector {
-    if (file.isDirectory) return MiuixIcons.Folder
+    if (file.isDirectory) return Icons.Default.Folder
     val ext = file.name.substringAfterLast('.', "").lowercase()
     return when (ext) {
         "zip", "rar", "7z", "tar", "gz", "tgz", "jar", "aar", "xapk", "bz2", "xz" -> Icons.Default.Archive
@@ -384,7 +385,7 @@ fun getFileIconMiuix(file: FileItem): ImageVector {
 }
 
 fun getFileBadgeColorMiuix(file: FileItem): Color {
-    if (file.isDirectory) return Color(0xFFFFB300)
+    if (file.isDirectory) return Color(0xFFF59E0B)
     val ext = file.name.substringAfterLast('.', "").lowercase()
     return when (ext) {
         "zip", "rar", "7z", "tar", "gz", "tgz", "jar", "aar", "xapk", "bz2", "xz" -> Color(0xFFFF9800)

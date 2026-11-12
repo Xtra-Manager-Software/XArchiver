@@ -11,6 +11,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Send
 import androidx.compose.material.icons.filled.Bookmark
+import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -447,7 +448,7 @@ fun MiuixFilesContent(
                             )
                         }
                         val isInternal = !storage.label.contains("USB", ignoreCase = true) && !storage.label.contains("SD", ignoreCase = true)
-                        val icon = if (isInternal) MiuixIcons.Phone else MiuixIcons.Folder
+                        val icon = if (isInternal) MiuixIcons.Phone else Icons.Default.Folder
                         val title = if (isInternal) stringResource(R.string.home_my_phone) else storage.label
                         val freeBytes = (storage.total - storage.used).coerceAtLeast(0L)
                         val usageFraction = if (storage.total > 0L) (storage.used.toFloat() / storage.total.toFloat()).coerceIn(0f, 1f) else 0f
@@ -1051,8 +1052,8 @@ fun MiuixRecentContent(viewModel: HomeViewModel, navController: NavController, i
                                 MiuixActionRow(
                                     title = file.name,
                                     subtitle = file.path,
-                                    icon = if (file.isDirectory) MiuixIcons.Folder else MiuixIcons.File,
-                                    iconTint = miuixBlue,
+                                    icon = if (file.isDirectory) Icons.Default.Folder else MiuixIcons.File,
+                                    iconTint = if (file.isDirectory) Color(0xFFF59E0B) else miuixBlue,
                                     primaryTextColor = primaryTextColor,
                                     secondaryTextColor = secondaryTextColor,
                                     onClick = {
