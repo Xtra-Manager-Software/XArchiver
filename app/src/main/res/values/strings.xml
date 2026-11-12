@@ -89,6 +89,25 @@
     <string name="home_storage_page_format">%1$d of %2$d</string>
     <string name="home_categories">Categories</string>
     <string name="home_quick_access">Quick Access</string>
+    <string name="home_browse">Browse</string>
+    <string name="home_recent_tab">Recent</string>
+    <string name="home_sources">Sources</string>
+    <string name="home_my_phone">My phone</string>
+    <string name="home_favorites">Favorites</string>
+    <string name="home_downloads">Downloads</string>
+    <string name="home_camera">Camera</string>
+    <string name="home_camera_desc">Photos &amp; camera captures</string>
+    <string name="home_screenshots">Screenshots &amp; recordings</string>
+    <string name="home_screenshots_desc">Device screen captures</string>
+    <string name="home_favorites_count">%1$d bookmarked folders</string>
+    <string name="home_favorites_empty">No bookmarked folders</string>
+    <string name="home_cat_doc">Docs</string>
+    <string name="home_cat_image">Images</string>
+    <string name="home_cat_video">Videos</string>
+    <string name="home_cat_music">Music</string>
+    <string name="home_cat_archive">Archives</string>
+    <string name="home_cat_apk">APK</string>
+    <string name="home_root_storage">System Storage (Root)</string>
 
     <!-- Storage Card -->
     <string name="storage_internal">Internal Storage</string>
@@ -262,6 +281,8 @@
     <string name="changelog_summary_2_0_0">Shizuku &amp; Root privileged access, multi-storage horizontal pager, native Rust payload parser, and Material 3 overhaul.</string>
     <string name="changelog_summary_1_1_0">Initial Android OTA Payload.bin extraction with Protocol Buffers, and streaming XZ/BZIP2 decompression.</string>
     <string name="changelog_summary_1_0_0">Initial release of XArchiver with essential archive handling and Material Design 3 file explorer.</string>
+    <string name="changelog_item_2_1_9_miuix_home_title">MIUIX HyperOS Home Redesign</string>
+    <string name="changelog_item_2_1_9_miuix_home_desc">Overhauled the MIUIX home screen to follow official HyperOS File Manager hierarchy with 2-column squircle category pills, consolidated Downloads &amp; Bookmarks quick access, modernized storage usage card with slim progress gauge &amp; filesystem badge, dedicated Sources section (Camera, Screenshots, Media), and dual-capsule floating navigation with instant search button.</string>
     <string name="changelog_item_2_1_9_realtime_title">Realtime File &amp; Directory Auto-Refresh</string>
     <string name="changelog_item_2_1_9_realtime_desc">Introduced automated realtime directory watching via Linux kernel inotify (FileObserver) and lifecycle resume observer across Material and MIUIX explorers. Newly transferred files from PC (MTP/ADB), camera photos, browser downloads, or folders created in other apps appear instantly without leaving or re-entering the folder.</string>
     <string name="changelog_item_2_1_9_home_ui_title">Material Home Layout Redesign</string>

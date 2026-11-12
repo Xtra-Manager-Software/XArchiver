@@ -89,6 +89,25 @@
     <string name="home_storage_page_format">%1$d dari %2$d</string>
     <string name="home_categories">Kategori</string>
     <string name="home_quick_access">Akses Cepat</string>
+    <string name="home_browse">Telusuri</string>
+    <string name="home_recent_tab">Baru-baru ini</string>
+    <string name="home_sources">Sumber</string>
+    <string name="home_my_phone">Ponsel saya</string>
+    <string name="home_favorites">Favorit</string>
+    <string name="home_downloads">Unduhan</string>
+    <string name="home_camera">Kamera</string>
+    <string name="home_camera_desc">Foto &amp; rekaman kamera</string>
+    <string name="home_screenshots">Screenshot &amp; rekaman layar</string>
+    <string name="home_screenshots_desc">Tangkapan layar perangkat</string>
+    <string name="home_favorites_count">%1$d folder ditandai</string>
+    <string name="home_favorites_empty">Belum ada folder ditandai</string>
+    <string name="home_cat_doc">Dok</string>
+    <string name="home_cat_image">Gambar</string>
+    <string name="home_cat_video">Video</string>
+    <string name="home_cat_music">Musik</string>
+    <string name="home_cat_archive">Arsip</string>
+    <string name="home_cat_apk">APK</string>
+    <string name="home_root_storage">Penyimpanan Sistem (Root)</string>
 
     <!-- Storage Card -->
     <string name="storage_internal">Penyimpanan Internal</string>
@@ -262,6 +281,8 @@
     <string name="changelog_summary_2_0_0">Akses istimewa Shizuku &amp; Root, pager horizontal multi-penyimpanan, parser payload native Rust, dan perombakan Material 3.</string>
     <string name="changelog_summary_1_1_0">Dukungan awal ekstraksi Android OTA Payload.bin dengan Protocol Buffers, dan dekompresi streaming XZ/BZIP2.</string>
     <string name="changelog_summary_1_0_0">Rilis perdana XArchiver dengan penanganan arsip inti dan pengelola berkas Material Design 3.</string>
+    <string name="changelog_item_2_1_9_miuix_home_title">Desain Ulang Beranda MIUIX HyperOS</string>
+    <string name="changelog_item_2_1_9_miuix_home_desc">Merombak total tampilan Beranda MIUIX mengadopsi hierarki resmi File Manager HyperOS dengan pil kategori 2 kolom bersudut squircle, akses cepat Unduhan &amp; Favorit terpadu, kartu penyimpanan modern dengan indikator baris tipis &amp; badge sistem berkas, bagian Sumber terdedikasi (Kamera, Screenshot, Media), dan bilah navigasi floating kapsul ganda dengan tombol pencarian cepat.</string>
     <string name="changelog_item_2_1_9_realtime_title">Penyegaran Berkas &amp; Folder Otomatis Realtime</string>
     <string name="changelog_item_2_1_9_realtime_desc">Menghadirkan pemantauan berkas waktu-nyata berbasis inotify kernel Linux (FileObserver) dan pengamat status aplikasi (ON_RESUME) di penjelajah Material dan MIUIX. Berkas baru yang ditransfer dari PC (MTP/ADB), foto kamera, unduhan browser, atau folder dari aplikasi lain langsung muncul seketika secara hening tanpa harus keluar dan masuk kembali ke folder.</string>
     <string name="changelog_item_2_1_9_home_ui_title">Desain Ulang Tata Letak Beranda Material</string>
