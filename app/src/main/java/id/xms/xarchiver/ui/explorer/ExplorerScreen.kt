@@ -28,6 +28,10 @@ import id.xms.xarchiver.core.archive.*
 import id.xms.xarchiver.core.install.ApkInstaller
 import id.xms.xarchiver.ui.components.LocalNotificationHost
 import id.xms.xarchiver.ui.explorer.material.*
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import id.xms.xarchiver.ui.explorer.utils.DirectoryWatcher
 import id.xms.xarchiver.ui.explorer.utils.FileActionHandler
 import id.xms.xarchiver.ui.explorer.utils.FileTypeDetector
 import id.xms.xarchiver.ui.theme.ThemeMode
@@ -67,6 +71,7 @@ fun ExplorerScreen(path: String, navController: NavController) {
     }
 
     val scope = rememberCoroutineScope()
+    val lifecycleOwner = LocalLifecycleOwner.current
     val archiveManager = remember { ArchiveManager(context) }
     val selectionManager = remember { SelectionManager() }
     val bookmarksManager = remember { BookmarksManager(context) }
@@ -194,10 +199,15 @@ fun ExplorerScreen(path: String, navController: NavController) {
     val listState = rememberLazyListState()
     val gridState = rememberLazyGridState()
 
-    fun refreshFiles() {
+    fun refreshFiles(silent: Boolean = false) {
         scope.launch {
-            isLoading = true
-            files = FileService.listDirectory(path)
+            if (!silent || files.isEmpty()) {
+                isLoading = true
+            }
+            val newFiles = FileService.listDirectory(path)
+            if (files != newFiles) {
+                files = newFiles
+            }
             isLoading = false
         }
     }
@@ -251,6 +261,34 @@ fun ExplorerScreen(path: String, navController: NavController) {
         searchQuery = ""
         searchCategory = ExplorerSearchCategory.ALL
         searchResults = emptyList()
+    }
+
+    // Observe file system changes within current directory in realtime
+    DisposableEffect(path) {
+        val watcher = DirectoryWatcher(
+            path = path,
+            scope = scope,
+            debounceMs = 400L
+        ) {
+            refreshFiles(silent = true)
+        }
+        watcher.start()
+        onDispose {
+            watcher.stop()
+        }
+    }
+
+    // Auto-refresh when app returns to foreground from background or other apps
+    DisposableEffect(lifecycleOwner, path) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                refreshFiles(silent = true)
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
     }
 
     // Handle batch extraction of multiple selected archives
@@ -570,7 +608,8 @@ fun ExplorerScreen(path: String, navController: NavController) {
                     ) {
                         itemsIndexed(
                             items = filteredFiles,
-                            key = { _, file -> file.path }
+                            key = { _, file -> file.path },
+                            contentType = { _, file -> if (file.isDirectory) "folder" else "file" }
                         ) { _, file ->
                             MaterialFileListItem(
                                 file = file,
@@ -614,7 +653,8 @@ fun ExplorerScreen(path: String, navController: NavController) {
                     ) {
                         itemsIndexed(
                             items = filteredFiles,
-                            key = { _, file -> file.path }
+                            key = { _, file -> file.path },
+                            contentType = { _, file -> if (file.isDirectory) "folder" else "file" }
                         ) { _, file ->
                             MaterialFileGridCard(
                                 file = file,
@@ -658,7 +698,8 @@ fun ExplorerScreen(path: String, navController: NavController) {
                     ) {
                         itemsIndexed(
                             items = filteredFiles,
-                            key = { _, file -> file.path }
+                            key = { _, file -> file.path },
+                            contentType = { _, file -> if (file.isDirectory) "folder" else "file" }
                         ) { _, file ->
                             MaterialFileWaterfallItem(
                                 file = file,
