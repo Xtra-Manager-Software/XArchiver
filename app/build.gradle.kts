@@ -7,6 +7,7 @@ import org.apache.http.impl.client.HttpClients
 import org.apache.http.util.EntityUtils
 import java.util.Date
 import java.text.SimpleDateFormat
+import java.lang.management.ManagementFactory
 import org.jetbrains.kotlin.gradle.plugin.getKotlinPluginVersion
 import kotlin.text.substringAfterLast
 
@@ -268,32 +269,40 @@ abstract class SendTelegramMessageTask : DefaultTask() {
         val buildMsgId = sendTelegramMessage("Processing build...", disableNotification = true)
         if (buildMsgId != null) pinTelegramMessage(buildMsgId)
 
+        val isWindows = System.getProperty("os.name").contains("Windows", ignoreCase = true)
         val javaVersion = JavaVersion.current().toString()
         val gradleVersion = project.gradle.gradleVersion
-        // val osName = System.getProperty("os.name")
-        val osName = try {
-            val process = ProcessBuilder("cat", "/etc/os-release")
-                .redirectErrorStream(true)
-                .start()
-            val output = process.inputStream.bufferedReader().readText()
-            process.waitFor()
-            val prettyNameLine = output.lines().find { it.startsWith("NAME=") }
-            prettyNameLine?.substringAfter("=")?.removeSurrounding("\"") ?: System.getProperty("os.name")
-        } catch (e: Exception) {
-            logger.warn("Could not read /etc/os-release: ${e.message}")
-            System.getProperty("os.name") // Fallback
+        val osName = if (isWindows) {
+            System.getProperty("os.name")
+        } else {
+            try {
+                val process = ProcessBuilder("cat", "/etc/os-release")
+                    .redirectErrorStream(true)
+                    .start()
+                val output = process.inputStream.bufferedReader().readText()
+                process.waitFor()
+                val prettyNameLine = output.lines().find { it.startsWith("NAME=") }
+                prettyNameLine?.substringAfter("=")?.removeSurrounding("\"") ?: System.getProperty("os.name")
+            } catch (e: Exception) {
+                logger.warn("Could not read /etc/os-release: ${e.message}")
+                System.getProperty("os.name") // Fallback
+            }
         }
         val osArch = System.getProperty("os.arch")
-        val processor = try {
-            val process = ProcessBuilder("cat", "/proc/cpuinfo")
-                .redirectErrorStream(true)
-                .start()
-            val output = process.inputStream.bufferedReader().readText()
-            process.waitFor()
-            output.lines().find { it.startsWith("model name") }?.substringAfter(":")?.trim() ?: osArch
-        } catch (e: Exception) {
-            logger.warn("Could not read /proc/cpuinfo: ${e.message}")
-            osArch // Fallback
+        val processor = if (isWindows) {
+            System.getenv("PROCESSOR_IDENTIFIER") ?: osArch
+        } else {
+            try {
+                val process = ProcessBuilder("cat", "/proc/cpuinfo")
+                    .redirectErrorStream(true)
+                    .start()
+                val output = process.inputStream.bufferedReader().readText()
+                process.waitFor()
+                output.lines().find { it.startsWith("model name") }?.substringAfter(":")?.trim() ?: osArch
+            } catch (e: Exception) {
+                logger.warn("Could not read /proc/cpuinfo: ${e.message}")
+                osArch // Fallback
+            }
         }
 
         // SDK Info
@@ -324,57 +333,71 @@ abstract class SendTelegramMessageTask : DefaultTask() {
             else -> "Unknown"
         }
 
-        val (totalRamGb, freeRamGb, usedRamGb) = try {
-            val process = ProcessBuilder("cat", "/proc/meminfo")
-                .redirectErrorStream(true)
-                .start()
-            val output = process.inputStream.bufferedReader().readText()
-            process.waitFor()
-            val lines = output.lines()
-            val memTotalKb = lines.find { it.startsWith("MemTotal:") }?.substringAfter(":")?.trim()?.removeSuffix(" kB")?.toLongOrNull() ?: 0L
-            val memFreeKb = lines.find { it.startsWith("MemFree:") }?.substringAfter(":")?.trim()?.removeSuffix(" kB")?.toLongOrNull() ?: 0L
-            // MemAvailable is generally a better indicator of free memory
-            val memAvailableKb = lines.find { it.startsWith("MemAvailable:") }?.substringAfter(":")?.trim()?.removeSuffix(" kB")?.toLongOrNull() ?: memFreeKb
+        val (totalRamGb, freeRamGb, usedRamGb) = if (isWindows) {
+            try {
+                val osBean = ManagementFactory.getOperatingSystemMXBean()
+                if (osBean is com.sun.management.OperatingSystemMXBean) {
+                    val totalBytes = osBean.totalMemorySize
+                    val freeBytes = osBean.freeMemorySize
+                    val usedBytes = totalBytes - freeBytes
+                    val totalGb = totalBytes / (1024.0 * 1024.0 * 1024.0)
+                    val freeGb = freeBytes / (1024.0 * 1024.0 * 1024.0)
+                    val usedGb = usedBytes / (1024.0 * 1024.0 * 1024.0)
+                    Triple(String.format("%.2f GB", totalGb), String.format("%.2f GB", freeGb), String.format("%.2f GB", usedGb))
+                } else {
+                    Triple("N/A", "N/A", "N/A")
+                }
+            } catch (e: Exception) {
+                Triple("N/A", "N/A", "N/A")
+            }
+        } else {
+            try {
+                val process = ProcessBuilder("cat", "/proc/meminfo")
+                    .redirectErrorStream(true)
+                    .start()
+                val output = process.inputStream.bufferedReader().readText()
+                process.waitFor()
+                val lines = output.lines()
+                val memTotalKb = lines.find { it.startsWith("MemTotal:") }?.substringAfter(":")?.trim()?.removeSuffix(" kB")?.toLongOrNull() ?: 0L
+                val memFreeKb = lines.find { it.startsWith("MemFree:") }?.substringAfter(":")?.trim()?.removeSuffix(" kB")?.toLongOrNull() ?: 0L
+                // MemAvailable is generally a better indicator of free memory
+                val memAvailableKb = lines.find { it.startsWith("MemAvailable:") }?.substringAfter(":")?.trim()?.removeSuffix(" kB")?.toLongOrNull() ?: memFreeKb
 
-            val totalGb = memTotalKb / (1024.0 * 1024.0)
-            val freeGb = memAvailableKb / (1024.0 * 1024.0)
-            val usedGb = totalGb - freeGb
+                val totalGb = memTotalKb / (1024.0 * 1024.0)
+                val freeGb = memAvailableKb / (1024.0 * 1024.0)
+                val usedGb = totalGb - freeGb
 
-            Triple(String.format("%.2f GB", totalGb), String.format("%.2f GB", freeGb), String.format("%.2f GB", usedGb))
+                Triple(String.format("%.2f GB", totalGb), String.format("%.2f GB", freeGb), String.format("%.2f GB", usedGb))
 
-        } catch (e: Exception) {
-            logger.warn("Could not read /proc/meminfo: ${e.message}")
-            Triple("N/A", "N/A", "N/A") // Fallback
+            } catch (e: Exception) {
+                logger.warn("Could not read /proc/meminfo: ${e.message}")
+                Triple("N/A", "N/A", "N/A") // Fallback
+            }
         }
 
         val (totalStorageGb, freeStorageGb) = try {
-            val process = ProcessBuilder("df", "-h", "/")
-                .redirectErrorStream(true)
-                .start()
-            val output = process.inputStream.bufferedReader().readText()
-            process.waitFor()
-            val lines = output.lines()
-            // Example df output: /dev/sda1       100G   50G   50G  50% /
-            val relevantLine = lines.find { it.contains(" /") }
-            val parts = relevantLine?.split("\\s+".toRegex())
-            val total = parts?.getOrNull(1) ?: "N/A"
-            val free = parts?.getOrNull(3) ?: "N/A"
+            val rootFile = project.rootDir
+            val total = String.format("%.2f GB", rootFile.totalSpace / (1024.0 * 1024.0 * 1024.0))
+            val free = String.format("%.2f GB", rootFile.usableSpace / (1024.0 * 1024.0 * 1024.0))
             Pair(total, free)
         } catch (e: Exception) {
-            logger.warn("Could not read disk usage: ${e.message}")
-            Pair("N/A", "N/A") // Fallback
+            Pair("N/A", "N/A")
         }
 
-        val kernelInfo = try {
-            val process = ProcessBuilder("uname", "-r")
-                .redirectErrorStream(true)
-                .start()
-            val output = process.inputStream.bufferedReader().readText().trim()
-            process.waitFor()
-            output.ifEmpty { "N/A" }
-        } catch (e: Exception) {
-            logger.warn("Could not read kernel info: ${e.message}")
-            "N/A" // Fallback
+        val kernelInfo = if (isWindows) {
+            "Windows NT ${System.getProperty("os.version")}"
+        } else {
+            try {
+                val process = ProcessBuilder("uname", "-r")
+                    .redirectErrorStream(true)
+                    .start()
+                val output = process.inputStream.bufferedReader().readText().trim()
+                process.waitFor()
+                output.ifEmpty { "N/A" }
+            } catch (e: Exception) {
+                logger.warn("Could not read kernel info: ${e.message}")
+                "N/A" // Fallback
+            }
         }
 
         val buildChangelog = changelog.getOrElse("")
