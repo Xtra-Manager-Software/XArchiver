@@ -10,7 +10,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.NoteAdd
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
+import androidx.navigationevent.NavigationEventDispatcher
+import androidx.navigationevent.NavigationEventDispatcherOwner
+import androidx.navigationevent.compose.LocalNavigationEventDispatcherOwner
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -164,30 +168,42 @@ fun MiuixSelectionDock(
                 }
             }
 
-            WindowIconDropdownMenu(
-                entry = DropdownEntry(items = moreItems),
-                backgroundColor = Color.Transparent,
-                minWidth = 0.dp,
-                minHeight = 0.dp,
-                cornerRadius = 12.dp
+            val currentDispatcherOwner = LocalNavigationEventDispatcherOwner.current
+            val fallbackDispatcherOwner = remember {
+                object : NavigationEventDispatcherOwner {
+                    override val navigationEventDispatcher = NavigationEventDispatcher()
+                }
+            }
+            val dispatcherOwner = currentDispatcherOwner ?: fallbackDispatcherOwner
+
+            CompositionLocalProvider(
+                LocalNavigationEventDispatcherOwner provides dispatcherOwner
             ) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp)
+                WindowIconDropdownMenu(
+                    entry = DropdownEntry(items = moreItems),
+                    backgroundColor = Color.Transparent,
+                    minWidth = 0.dp,
+                    minHeight = 0.dp,
+                    cornerRadius = 12.dp
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.MoreVert,
-                        contentDescription = "Lainnya",
-                        tint = MiuixTheme.colorScheme.onSurface,
-                        modifier = Modifier.size(22.dp)
-                    )
-                    Spacer(Modifier.height(3.dp))
-                    Text(
-                        text = "Lainnya",
-                        color = MiuixTheme.colorScheme.onSurface,
-                        fontSize = 10.sp,
-                        fontWeight = FontWeight.Medium
-                    )
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.MoreVert,
+                            contentDescription = "Lainnya",
+                            tint = MiuixTheme.colorScheme.onSurface,
+                            modifier = Modifier.size(22.dp)
+                        )
+                        Spacer(Modifier.height(3.dp))
+                        Text(
+                            text = "Lainnya",
+                            color = MiuixTheme.colorScheme.onSurface,
+                            fontSize = 10.sp,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
                 }
             }
         }

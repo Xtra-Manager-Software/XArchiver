@@ -56,12 +56,22 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.navigationevent.NavigationEventDispatcher
+import androidx.navigationevent.NavigationEventDispatcherOwner
+import androidx.navigationevent.OnBackInvokedDefaultInput
+import androidx.navigationevent.compose.LocalNavigationEventDispatcherOwner
+import androidx.navigationevent.setViewTreeNavigationEventDispatcherOwner
 
-class MainActivity : ComponentActivity() {
+class MainActivity : ComponentActivity(), NavigationEventDispatcherOwner {
+    override val navigationEventDispatcher: NavigationEventDispatcher = NavigationEventDispatcher()
     private var shouldOpenUpdateScreen by mutableStateOf(false)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            navigationEventDispatcher.addInput(OnBackInvokedDefaultInput(onBackInvokedDispatcher))
+        }
+        window.decorView.setViewTreeNavigationEventDispatcherOwner(this)
         unlockHighRefreshRate()
         requestNotificationPermission()
         handleUpdateIntent(intent)
@@ -77,7 +87,10 @@ class MainActivity : ComponentActivity() {
         setContent {
             XArchiverTheme {
                 val notificationHostState = remember { NotificationHostState() }
-                CompositionLocalProvider(LocalNotificationHost provides notificationHostState) {
+                CompositionLocalProvider(
+                    LocalNavigationEventDispatcherOwner provides this,
+                    LocalNotificationHost provides notificationHostState
+                ) {
                     Box(modifier = Modifier.fillMaxSize()) {
                         AppContent(
                             openUpdateScreen = shouldOpenUpdateScreen,

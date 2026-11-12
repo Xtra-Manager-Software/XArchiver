@@ -96,6 +96,8 @@ dependencies {
     implementation(libs.miuix.blur)
     implementation(libs.miuix.icons)
     implementation(libs.miuix.preference)
+    implementation("androidx.navigationevent:navigationevent-android:1.1.2")
+    implementation("androidx.navigationevent:navigationevent-compose-android:1.1.2")
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("androidx.core:core-ktx:1.12.0")
     implementation(project(":core-storage"))
