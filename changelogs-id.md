@@ -4,6 +4,20 @@ Semua perubahan penting pada XArchiver akan didokumentasikan dalam berkas ini.
 
 ## [2.1.9] - 2026-10-08
 
+### Desain Ulang Antarmuka - Beranda MIUIX HyperOS Modern
+- **Tata Letak Pil Kategori 2 Kolom × 3 Baris**:
+  - Mengadopsi arsitektur visual resmi Pengelola Berkas HyperOS dengan deretan pil bersudut squircle 18dp: **Dok** (Amber), **Gambar** (Royal Blue), **Video** (Purple), **Musik** (Coral Red), **Arsip** (Cyan), dan **APK** (Emerald Green).
+  - Dilengkapi ikon kontainer bersudut melengkung yang khas dan penghitungan jumlah item berkas aktual secara asinkron.
+- **Grup Akses Cepat Terpadu**:
+  - Kartu sudut membulat 20dp yang menggabungkan akses langsung ke folder **Unduhan** (`/sdcard/Download`) dan **Favorit** (terintegrasi dengan `BookmarksManager` lokal yang menampilkan jumlah folder yang ditandai).
+- **Kartu Penyimpanan Modern & Dukungan Root Privileged**:
+  - Menampilkan penyimpanan internal ("Ponsel saya") lengkap dengan indikator sisa kapasitas, *segmented thin progress gauge* 4dp, dan badge sistem berkas (seperti F2FS/ext4).
+  - Menghadirkan baris khusus **Penyimpanan Sistem (Root)** dengan badge Root Amber saat opsi akses Root aktif.
+- **Seksi Sumber Terdedikasi (Sources)**:
+  - Mengelompokkan jalan pintas direktori media utama: **Kamera** (`DCIM/Camera`), **Screenshot & rekaman layar** (`Pictures/Screenshots`), serta pintasan berkas pesan (WhatsApp, Telegram, Bluetooth).
+- **Bilah Navigasi Mengambang Kapsul Ganda & Tombol Cari Cepat**:
+  - Menggabungkan kapsul navigasi melayang (*texture blur* kaca) untuk peralihan mulus antara tab **Baru-baru ini** dan **Telusuri**, berdampingan dengan tombol lingkaran mengambang pencarian cepat.
+
 ### Fitur Baru - Pemantauan & Penyegaran Berkas Realtime Otomatis
 - **Pemantau Direktori Waktu-Nyata Berbasis Kernel (DirectoryWatcher & inotify)**:
   - Mengintegrasikan `android.os.FileObserver` untuk mendeteksi event inotify kernel Linux secara langsung pada direktori yang sedang dibuka (pembuatan berkas/folder baru, penghapusan, pemindahan berkas keluar/masuk, dan penulisan berkas selesai).

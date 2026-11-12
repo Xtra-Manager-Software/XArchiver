@@ -56,6 +56,12 @@ object ChangelogRepository {
                     tags = listOf("Material 3", "Home Screen", "StorageCard", "CategoryGrid", "Quick Access", "Floating Bar")
                 ),
                 ChangelogItem(
+                    titleRes = R.string.changelog_item_2_1_9_miuix_home_title,
+                    descRes = R.string.changelog_item_2_1_9_miuix_home_desc,
+                    category = ChangelogCategory.UI,
+                    tags = listOf("MIUIX", "HyperOS", "Home Screen", "Category Grid", "Pill Cards", "Storage Card")
+                ),
+                ChangelogItem(
                     titleRes = R.string.changelog_item_2_1_9_search_title,
                     descRes = R.string.changelog_item_2_1_9_search_desc,
                     category = ChangelogCategory.FEATURES,

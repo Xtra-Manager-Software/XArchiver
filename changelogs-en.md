@@ -4,6 +4,20 @@ All notable changes to XArchiver will be documented in this file.
 
 ## [2.1.9] - 2026-10-08
 
+### UI Redesign - Modernized MIUIX HyperOS Home Screen
+- **2-Column x 3-Row Category Pills Layout**:
+  - Adopted the official HyperOS File Manager visual layout with 18dp squircle pill cards: **Docs** (Amber), **Images** (Royal Blue), **Videos** (Purple), **Music** (Coral Red), **Archives** (Cyan), and **APK** (Emerald Green).
+  - Features dedicated squircle icon containers with distinct vibrant accent colors and live asynchronous item count indicators.
+- **Consolidated Quick Access Group**:
+  - Refined 20dp rounded surface combining direct access to **Downloads** (`/sdcard/Download`) and **Favorites** (integrated with the local `BookmarksManager` displaying live bookmarked folder count).
+- **Modern Storage Card & Privileged Root Integration**:
+  - Displays primary internal storage ("My phone") with remaining capacity breakdown, a slim 4dp linear progress bar, and filesystem badge (e.g. F2FS/ext4).
+  - Seamlessly integrates a dedicated **System Storage (Root)** card row with amber Root badge when privileged access is enabled.
+- **Dedicated Sources Section**:
+  - Grouped access to core media folders: **Camera** (`DCIM/Camera`), **Screenshots & screen recordings** (`Pictures/Screenshots`), and messaging media directories (WhatsApp, Telegram, Bluetooth).
+- **Dual-Capsule Floating Navigation & Quick Search Circle**:
+  - Features a floating frosted glassmorphism navigation capsule for seamless switching between **Recent** and **Browse** tabs, flanked by a floating circular quick search button.
+
 ### New Features - Automated Realtime File & Directory Auto-Refresh
 - **Kernel-Level Realtime Directory Watching (DirectoryWatcher & inotify)**:
   - Integrated `android.os.FileObserver` to capture Linux kernel inotify events directly on the active folder (file/directory creation, deletion, moves in/out, and write completions).
