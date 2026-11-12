@@ -44,6 +44,12 @@ object ChangelogRepository {
             badgeRes = R.string.changelog_badge_latest,
             items = listOf(
                 ChangelogItem(
+                    titleRes = R.string.changelog_item_2_1_9_realtime_title,
+                    descRes = R.string.changelog_item_2_1_9_realtime_desc,
+                    category = ChangelogCategory.FEATURES,
+                    tags = listOf("Realtime", "Auto-Refresh", "FileObserver", "inotify", "MTP", "Silent Update")
+                ),
+                ChangelogItem(
                     titleRes = R.string.changelog_item_2_1_9_home_ui_title,
                     descRes = R.string.changelog_item_2_1_9_home_ui_desc,
                     category = ChangelogCategory.UI,

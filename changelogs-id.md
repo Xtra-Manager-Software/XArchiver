@@ -4,6 +4,21 @@ Semua perubahan penting pada XArchiver akan didokumentasikan dalam berkas ini.
 
 ## [2.1.9] - 2026-10-08
 
+### Fitur Baru - Pemantauan & Penyegaran Berkas Realtime Otomatis
+- **Pemantau Direktori Waktu-Nyata Berbasis Kernel (DirectoryWatcher & inotify)**:
+  - Mengintegrasikan `android.os.FileObserver` untuk mendeteksi event inotify kernel Linux secara langsung pada direktori yang sedang dibuka (pembuatan berkas/folder baru, penghapusan, pemindahan berkas keluar/masuk, dan penulisan berkas selesai).
+  - Berkas baru yang ditransfer langsung dari PC (via MTP atau ADB), foto yang baru diambil kamera, berkas unduhan dari peramban, maupun folder yang dibuat dari pengelola berkas lain langsung muncul seketika tanpa perlu keluar (back) dan masuk kembali ke folder tersebut.
+- **Penyegaran Hening Latar Belakang (Silent Background Refresh)**:
+  - Pembaruan berkas dari pemantau waktu-nyata dieksekusi secara hening (*silent*) di `Dispatchers.IO` tanpa menampilkan kerangka skeleton loading yang berkedip.
+  - Mempertahankan posisi gulir (*scroll position*) pengguna serta status seleksi berkas secara stabil berkat mekanisme *key diffing* Compose.
+- **Pencegah Banjir Event (Coroutine Debounce & Throttle Guard)**:
+  - Menerapkan *trailing debounce* sebesar 400 milidetik untuk mencegah pemindaian berulang saat mentransfer berkas dalam jumlah banyak secara beruntun.
+  - Dilengkapi *throttle guard* (maksimum interval 1.5 detik) yang tetap memperbarui tampilan berkas secara berkala saat proses transfer berkas berukuran besar atau ratusan berkas masih berlangsung.
+- **Penyegaran Otomatis Siklus Hidup (Lifecycle ON_RESUME Observer)**:
+  - Menyegarkan direktori secara otomatis saat aplikasi kembali ke latar depan dari latar belakang atau dari aplikasi lain, menjamin daftar berkas selalu akurat.
+- **Dukungan Penuh pada Tema Material 3 dan MIUIX HyperOS**:
+  - Bekerja secara terpadu dan konsisten baik pada penjelajah berkas antarmuka Material You dinamis maupun MIUIX HyperOS.
+
 ### Fitur Baru - Sistem Pencarian Terlingkup Cerdas (Scoped Search) & Mesin XArcDeep
 - **Pencarian Terlingkup Direktori Aktif (Folder-Scoped Search)**:
   - Mengadopsi alur pencarian modern ala pengelola berkas ColorOS 17 di mana penelusuran secara cerdas terisolasi pada direktori yang sedang dibuka (misal saat mencari di folder `Documents` atau `Download`, hanya berkas dan subfolder di dalam folder tersebut yang dipindai).

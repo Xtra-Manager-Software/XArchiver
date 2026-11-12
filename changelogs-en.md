@@ -4,6 +4,21 @@ All notable changes to XArchiver will be documented in this file.
 
 ## [2.1.9] - 2026-10-08
 
+### New Features - Automated Realtime File & Directory Auto-Refresh
+- **Kernel-Level Realtime Directory Watching (DirectoryWatcher & inotify)**:
+  - Integrated `android.os.FileObserver` to capture Linux kernel inotify events directly on the active folder (file/directory creation, deletion, moves in/out, and write completions).
+  - Newly added files transferred from PC (via MTP or ADB), captured camera photos, browser downloads, or folders created from external file manager apps appear immediately without leaving or re-entering the folder.
+- **Silent Background Refresh Mechanism**:
+  - Live directory updates are fetched silently on `Dispatchers.IO` without triggering disruptive skeleton loading shimmers.
+  - Preserves user scroll position and selection state cleanly through Compose key diffing mechanics.
+- **Event Burst Debouncing & Throttle Guards**:
+  - Employs a 400ms trailing coroutine debounce to prevent redundant disk I/O when batch transferring multiple files.
+  - Features an internal 1.5-second throttle guard that periodically refreshes file views even during prolonged multi-file transfers.
+- **Lifecycle Resume Auto-Refresh (ON_RESUME Observer)**:
+  - Automatically queries and updates directory listings whenever XArchiver returns to the foreground from other apps or device sleep.
+- **Full Parity Across Material 3 and MIUIX HyperOS Explorers**:
+  - Identically operational on both Material You Monet dynamic theming and MIUIX HyperOS file explorers.
+
 ### New Features - Intelligent Scoped Search & XArcDeep Engine
 - **Directory-Scoped Search Workflow**:
   - Implemented modern folder-scoped search mechanics inspired by the ColorOS 17 file manager: searching inside specific directories (e.g. `Documents` or `Download`) strictly scans that active folder hierarchy.
