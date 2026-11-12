@@ -10,7 +10,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Send
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -61,7 +60,7 @@ fun MiuixHomeScreen(navController: NavController, viewModel: HomeViewModel) {
 
     val pageBgColor = if (isDark) Color.Black else Color(0xFFF3F4F6)
     val screenTitle = if (currentTab == HomeTab.Files) {
-        stringResource(R.string.home_browse)
+        stringResource(R.string.app_name)
     } else {
         stringResource(R.string.home_recent_tab)
     }
@@ -95,128 +94,81 @@ fun MiuixHomeScreen(navController: NavController, viewModel: HomeViewModel) {
             )
         },
         floatingActionButton = {
-            Row(
+            // Dual Pill Navigation Capsule
+            Surface(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 20.dp, vertical = 14.dp),
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically
+                    .padding(bottom = 12.dp)
+                    .shadow(
+                        elevation = if (isDark) 12.dp else 8.dp,
+                        shape = RoundedCornerShape(100),
+                        spotColor = if (isDark) Color.Black.copy(alpha = 0.6f) else Color.Black.copy(alpha = 0.12f),
+                        ambientColor = if (isDark) Color.Black.copy(alpha = 0.4f) else Color.Black.copy(alpha = 0.06f)
+                    )
+                    .border(
+                        width = 0.5.dp,
+                        color = if (isDark) Color(0xFF2C2C2F) else Color(0xFFE2E4E9),
+                        shape = RoundedCornerShape(100)
+                    )
+                    .textureBlur(
+                        backdrop = backdrop,
+                        shape = RoundedCornerShape(100),
+                        blurRadiusX = 25f,
+                        blurRadiusY = 25f
+                    ),
+                color = if (isDark) Color(0xFF1A1A1C).copy(alpha = 0.88f) else Color.White.copy(alpha = 0.88f),
+                shape = RoundedCornerShape(100)
             ) {
-                // Dual Pill Navigation Capsule
-                Surface(
-                    modifier = Modifier
-                        .shadow(
-                            elevation = if (isDark) 12.dp else 8.dp,
-                            shape = RoundedCornerShape(100),
-                            spotColor = if (isDark) Color.Black.copy(alpha = 0.6f) else Color.Black.copy(alpha = 0.12f),
-                            ambientColor = if (isDark) Color.Black.copy(alpha = 0.4f) else Color.Black.copy(alpha = 0.06f)
-                        )
-                        .border(
-                            width = 0.5.dp,
-                            color = if (isDark) Color(0xFF2C2C2F) else Color(0xFFE2E4E9),
-                            shape = RoundedCornerShape(100)
-                        )
-                        .textureBlur(
-                            backdrop = backdrop,
-                            shape = RoundedCornerShape(100),
-                            blurRadiusX = 25f,
-                            blurRadiusY = 25f
-                        ),
-                    color = if (isDark) Color(0xFF1A1A1C).copy(alpha = 0.88f) else Color.White.copy(alpha = 0.88f),
-                    shape = RoundedCornerShape(100)
+                Row(
+                    modifier = Modifier.padding(horizontal = 6.dp, vertical = 5.dp),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Row(
-                        modifier = Modifier.padding(horizontal = 6.dp, vertical = 5.dp),
-                        verticalAlignment = Alignment.CenterVertically
+                    val isRecent = currentTab == HomeTab.Recent
+                    Button(
+                        onClick = { currentTab = HomeTab.Recent },
+                        modifier = Modifier.padding(end = 4.dp),
+                        colors = if (isRecent) {
+                            ButtonDefaults.buttonColorsPrimary()
+                        } else {
+                            ButtonDefaults.buttonColors(color = Color.Transparent, contentColor = MiuixTheme.colorScheme.onSurface)
+                        }
                     ) {
-                        val isRecent = currentTab == HomeTab.Recent
-                        Button(
-                            onClick = { currentTab = HomeTab.Recent },
-                            modifier = Modifier.padding(end = 4.dp),
-                            colors = if (isRecent) {
-                                ButtonDefaults.buttonColorsPrimary()
-                            } else {
-                                ButtonDefaults.buttonColors(color = Color.Transparent, contentColor = MiuixTheme.colorScheme.onSurface)
-                            }
-                        ) {
-                            androidx.compose.material3.Icon(
-                                imageVector = MiuixIcons.Recent,
-                                contentDescription = null,
-                                modifier = Modifier
-                                    .padding(end = 6.dp)
-                                    .size(17.dp),
-                                tint = if (isRecent) MiuixTheme.colorScheme.onPrimary else MiuixTheme.colorScheme.onSurface
-                            )
-                            Text(
-                                text = stringResource(R.string.home_recent_tab),
-                                fontWeight = if (isRecent) FontWeight.SemiBold else FontWeight.Normal,
-                                fontSize = 14.sp
-                            )
-                        }
-
-                        val isFiles = currentTab == HomeTab.Files
-                        Button(
-                            onClick = { currentTab = HomeTab.Files },
-                            modifier = Modifier.padding(start = 4.dp),
-                            colors = if (isFiles) {
-                                ButtonDefaults.buttonColorsPrimary()
-                            } else {
-                                ButtonDefaults.buttonColors(color = Color.Transparent, contentColor = MiuixTheme.colorScheme.onSurface)
-                            }
-                        ) {
-                            androidx.compose.material3.Icon(
-                                imageVector = MiuixIcons.Folder,
-                                contentDescription = null,
-                                modifier = Modifier
-                                    .padding(end = 6.dp)
-                                    .size(17.dp),
-                                tint = if (isFiles) MiuixTheme.colorScheme.onPrimary else MiuixTheme.colorScheme.onSurface
-                            )
-                            Text(
-                                text = stringResource(R.string.home_browse),
-                                fontWeight = if (isFiles) FontWeight.SemiBold else FontWeight.Normal,
-                                fontSize = 14.sp
-                            )
-                        }
-                    }
-                }
-
-                Spacer(modifier = Modifier.width(10.dp))
-
-                // Floating Circular Quick Search Button
-                Surface(
-                    modifier = Modifier
-                        .size(50.dp)
-                        .shadow(
-                            elevation = if (isDark) 12.dp else 8.dp,
-                            shape = CircleShape,
-                            spotColor = if (isDark) Color.Black.copy(alpha = 0.6f) else Color.Black.copy(alpha = 0.12f),
-                            ambientColor = if (isDark) Color.Black.copy(alpha = 0.4f) else Color.Black.copy(alpha = 0.06f)
-                        )
-                        .border(
-                            width = 0.5.dp,
-                            color = if (isDark) Color(0xFF2C2C2F) else Color(0xFFE2E4E9),
-                            shape = CircleShape
-                        )
-                        .textureBlur(
-                            backdrop = backdrop,
-                            shape = CircleShape,
-                            blurRadiusX = 25f,
-                            blurRadiusY = 25f
-                        )
-                        .clip(CircleShape)
-                        .clickable {
-                            navController.navigate("explorer/${Uri.encode("/sdcard")}")
-                        },
-                    color = if (isDark) Color(0xFF1A1A1C).copy(alpha = 0.88f) else Color.White.copy(alpha = 0.88f),
-                    shape = CircleShape
-                ) {
-                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         androidx.compose.material3.Icon(
-                            imageVector = Icons.Default.Search,
-                            contentDescription = stringResource(R.string.explorer_search_files),
-                            tint = if (isDark) Color.White else Color(0xFF1F2937),
-                            modifier = Modifier.size(22.dp)
+                            imageVector = MiuixIcons.Recent,
+                            contentDescription = null,
+                            modifier = Modifier
+                                .padding(end = 6.dp)
+                                .size(17.dp),
+                            tint = if (isRecent) MiuixTheme.colorScheme.onPrimary else MiuixTheme.colorScheme.onSurface
+                        )
+                        Text(
+                            text = stringResource(R.string.home_recent_tab),
+                            fontWeight = if (isRecent) FontWeight.SemiBold else FontWeight.Normal,
+                            fontSize = 14.sp
+                        )
+                    }
+
+                    val isFiles = currentTab == HomeTab.Files
+                    Button(
+                        onClick = { currentTab = HomeTab.Files },
+                        modifier = Modifier.padding(start = 4.dp),
+                        colors = if (isFiles) {
+                            ButtonDefaults.buttonColorsPrimary()
+                        } else {
+                            ButtonDefaults.buttonColors(color = Color.Transparent, contentColor = MiuixTheme.colorScheme.onSurface)
+                        }
+                    ) {
+                        androidx.compose.material3.Icon(
+                            imageVector = MiuixIcons.Folder,
+                            contentDescription = null,
+                            modifier = Modifier
+                                .padding(end = 6.dp)
+                                .size(17.dp),
+                            tint = if (isFiles) MiuixTheme.colorScheme.onPrimary else MiuixTheme.colorScheme.onSurface
+                        )
+                        Text(
+                            text = stringResource(R.string.home_browse),
+                            fontWeight = if (isFiles) FontWeight.SemiBold else FontWeight.Normal,
+                            fontSize = 14.sp
                         )
                     }
                 }

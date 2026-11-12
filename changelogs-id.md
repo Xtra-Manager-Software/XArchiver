@@ -15,8 +15,8 @@ Semua perubahan penting pada XArchiver akan didokumentasikan dalam berkas ini.
   - Menghadirkan baris khusus **Penyimpanan Sistem (Root)** dengan badge Root Amber saat opsi akses Root aktif.
 - **Seksi Sumber Terdedikasi (Sources)**:
   - Mengelompokkan jalan pintas direktori media utama: **Kamera** (`DCIM/Camera`), **Screenshot & rekaman layar** (`Pictures/Screenshots`), serta pintasan berkas pesan (WhatsApp, Telegram, Bluetooth).
-- **Bilah Navigasi Mengambang Kapsul Ganda & Tombol Cari Cepat**:
-  - Menggabungkan kapsul navigasi melayang (*texture blur* kaca) untuk peralihan mulus antara tab **Baru-baru ini** dan **Telusuri**, berdampingan dengan tombol lingkaran mengambang pencarian cepat.
+- **Bilah Navigasi Mengambang Kapsul Ganda**:
+  - Menggabungkan kapsul navigasi melayang (*texture blur* kaca) untuk peralihan mulus antara tab **Baru-baru ini** dan **Telusuri**.
 
 ### Fitur Baru - Pemantauan & Penyegaran Berkas Realtime Otomatis
 - **Pemantau Direktori Waktu-Nyata Berbasis Kernel (DirectoryWatcher & inotify)**:

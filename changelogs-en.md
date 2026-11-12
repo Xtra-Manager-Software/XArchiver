@@ -15,8 +15,8 @@ All notable changes to XArchiver will be documented in this file.
   - Seamlessly integrates a dedicated **System Storage (Root)** card row with amber Root badge when privileged access is enabled.
 - **Dedicated Sources Section**:
   - Grouped access to core media folders: **Camera** (`DCIM/Camera`), **Screenshots & screen recordings** (`Pictures/Screenshots`), and messaging media directories (WhatsApp, Telegram, Bluetooth).
-- **Dual-Capsule Floating Navigation & Quick Search Circle**:
-  - Features a floating frosted glassmorphism navigation capsule for seamless switching between **Recent** and **Browse** tabs, flanked by a floating circular quick search button.
+- **Dual-Capsule Floating Navigation**:
+  - Features a floating frosted glassmorphism navigation capsule for seamless switching between **Recent** and **Browse** tabs.
 
 ### New Features - Automated Realtime File & Directory Auto-Refresh
 - **Kernel-Level Realtime Directory Watching (DirectoryWatcher & inotify)**:
