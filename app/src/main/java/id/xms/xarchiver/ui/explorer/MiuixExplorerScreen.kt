@@ -2,6 +2,8 @@ package id.xms.xarchiver.ui.explorer
 
 import android.net.Uri
 import androidx.compose.animation.*
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -12,6 +14,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -599,7 +602,47 @@ fun MiuixExplorerScreen(path: String, navController: NavController) {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 // Clipboard paste dock
-                if (hasClipboard && !isSelecting) {
+                AnimatedVisibility(
+                    visible = hasClipboard && !isSelecting,
+                    enter = slideInVertically(
+                        initialOffsetY = { it },
+                        animationSpec = spring(
+                            dampingRatio = 0.68f,
+                            stiffness = Spring.StiffnessMediumLow
+                        )
+                    ) + scaleIn(
+                        initialScale = 0.85f,
+                        transformOrigin = TransformOrigin(0.5f, 1f),
+                        animationSpec = spring(
+                            dampingRatio = 0.68f,
+                            stiffness = Spring.StiffnessMediumLow
+                        )
+                    ) + fadeIn(
+                        animationSpec = spring(
+                            dampingRatio = Spring.DampingRatioNoBouncy,
+                            stiffness = Spring.StiffnessMediumLow
+                        )
+                    ),
+                    exit = slideOutVertically(
+                        targetOffsetY = { it },
+                        animationSpec = spring(
+                            dampingRatio = Spring.DampingRatioNoBouncy,
+                            stiffness = Spring.StiffnessMedium
+                        )
+                    ) + scaleOut(
+                        targetScale = 0.85f,
+                        transformOrigin = TransformOrigin(0.5f, 1f),
+                        animationSpec = spring(
+                            dampingRatio = Spring.DampingRatioNoBouncy,
+                            stiffness = Spring.StiffnessMedium
+                        )
+                    ) + fadeOut(
+                        animationSpec = spring(
+                            dampingRatio = Spring.DampingRatioNoBouncy,
+                            stiffness = Spring.StiffnessMedium
+                        )
+                    )
+                ) {
                     MiuixClipboardDock(
                         clipboardCount = clipboardCount,
                         isCut = clipboardOp == ClipboardOperation.CUT,
@@ -630,8 +673,44 @@ fun MiuixExplorerScreen(path: String, navController: NavController) {
                 // Selection mode action dock
                 AnimatedVisibility(
                     visible = isSelecting,
-                    enter = slideInVertically(initialOffsetY = { it }) + fadeIn(),
-                    exit = slideOutVertically(targetOffsetY = { it }) + fadeOut()
+                    enter = slideInVertically(
+                        initialOffsetY = { it },
+                        animationSpec = spring(
+                            dampingRatio = 0.68f,
+                            stiffness = Spring.StiffnessMediumLow
+                        )
+                    ) + scaleIn(
+                        initialScale = 0.85f,
+                        transformOrigin = TransformOrigin(0.5f, 1f),
+                        animationSpec = spring(
+                            dampingRatio = 0.68f,
+                            stiffness = Spring.StiffnessMediumLow
+                        )
+                    ) + fadeIn(
+                        animationSpec = spring(
+                            dampingRatio = Spring.DampingRatioNoBouncy,
+                            stiffness = Spring.StiffnessMediumLow
+                        )
+                    ),
+                    exit = slideOutVertically(
+                        targetOffsetY = { it },
+                        animationSpec = spring(
+                            dampingRatio = Spring.DampingRatioNoBouncy,
+                            stiffness = Spring.StiffnessMedium
+                        )
+                    ) + scaleOut(
+                        targetScale = 0.85f,
+                        transformOrigin = TransformOrigin(0.5f, 1f),
+                        animationSpec = spring(
+                            dampingRatio = Spring.DampingRatioNoBouncy,
+                            stiffness = Spring.StiffnessMedium
+                        )
+                    ) + fadeOut(
+                        animationSpec = spring(
+                            dampingRatio = Spring.DampingRatioNoBouncy,
+                            stiffness = Spring.StiffnessMedium
+                        )
+                    )
                 ) {
                     val selectedArchives = selectionManager.selectedPaths.filter {
                         FileTypeDetector.isArchiveExtension(File(it).name)

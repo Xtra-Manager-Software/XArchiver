@@ -1,8 +1,13 @@
 package id.xms.xarchiver.ui.explorer.miuix
 
 import androidx.compose.animation.*
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -11,6 +16,7 @@ import androidx.compose.material.icons.automirrored.filled.NoteAdd
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.navigationevent.NavigationEventDispatcher
 import androidx.navigationevent.NavigationEventDispatcherOwner
@@ -20,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -95,42 +102,18 @@ fun MiuixSelectionDock(
                         add(
                             DropdownItem(
                                 text = "Ganti Nama",
-                                icon = { modifier ->
-                                    Icon(
-                                        imageVector = Icons.Default.Edit,
-                                        contentDescription = null,
-                                        modifier = modifier,
-                                        tint = MiuixTheme.colorScheme.primary
-                                    )
-                                },
                                 onClick = onRename
                             )
                         )
                         add(
                             DropdownItem(
                                 text = "Properti",
-                                icon = { modifier ->
-                                    Icon(
-                                        imageVector = Icons.Default.Info,
-                                        contentDescription = null,
-                                        modifier = modifier,
-                                        tint = MiuixTheme.colorScheme.primary
-                                    )
-                                },
                                 onClick = onProperties
                             )
                         )
                         add(
                             DropdownItem(
                                 text = "Tambah Bookmark",
-                                icon = { modifier ->
-                                    Icon(
-                                        imageVector = Icons.Default.Bookmark,
-                                        contentDescription = null,
-                                        modifier = modifier,
-                                        tint = MiuixTheme.colorScheme.primary
-                                    )
-                                },
                                 onClick = onBookmark
                             )
                         )
@@ -138,14 +121,6 @@ fun MiuixSelectionDock(
                     add(
                         DropdownItem(
                             text = "Bagikan",
-                            icon = { modifier ->
-                                Icon(
-                                    imageVector = Icons.Default.Share,
-                                    contentDescription = null,
-                                    modifier = modifier,
-                                    tint = MiuixTheme.colorScheme.primary
-                                )
-                            },
                             onClick = onShare
                         )
                     )
@@ -153,14 +128,6 @@ fun MiuixSelectionDock(
                         add(
                             DropdownItem(
                                 text = "Buka Arsip",
-                                icon = { modifier ->
-                                    Icon(
-                                        imageVector = Icons.Default.FolderZip,
-                                        contentDescription = null,
-                                        modifier = modifier,
-                                        tint = MiuixTheme.colorScheme.primary
-                                    )
-                                },
                                 onClick = onOpenArchive
                             )
                         )
@@ -186,16 +153,44 @@ fun MiuixSelectionDock(
                     minHeight = 0.dp,
                     cornerRadius = 12.dp
                 ) {
+                    val interactionSource = remember { MutableInteractionSource() }
+                    val isPressed by interactionSource.collectIsPressedAsState()
+                    val scale by animateFloatAsState(
+                        targetValue = if (isPressed) 0.88f else 1f,
+                        animationSpec = spring(
+                            dampingRatio = Spring.DampingRatioMediumBouncy,
+                            stiffness = Spring.StiffnessMediumLow
+                        ),
+                        label = "moreScale"
+                    )
+
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
-                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp)
+                        modifier = Modifier
+                            .graphicsLayer {
+                                scaleX = scale
+                                scaleY = scale
+                            }
+                            .clip(RoundedCornerShape(12.dp))
+                            .padding(horizontal = 8.dp, vertical = 6.dp)
                     ) {
-                        Icon(
-                            imageVector = Icons.Default.MoreVert,
-                            contentDescription = "Lainnya",
-                            tint = MiuixTheme.colorScheme.onSurface,
-                            modifier = Modifier.size(22.dp)
-                        )
+                        Box(
+                            contentAlignment = Alignment.Center,
+                            modifier = Modifier
+                                .size(24.dp)
+                                .border(
+                                    width = 1.5.dp,
+                                    color = MiuixTheme.colorScheme.onSurface.copy(alpha = 0.8f),
+                                    shape = CircleShape
+                                )
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.MoreHoriz,
+                                contentDescription = "Lainnya",
+                                tint = MiuixTheme.colorScheme.onSurface,
+                                modifier = Modifier.size(16.dp)
+                            )
+                        }
                         Spacer(Modifier.height(3.dp))
                         Text(
                             text = "Lainnya",
@@ -219,12 +214,30 @@ fun MiuixDockAction(
 ) {
     val defaultColor = MiuixTheme.colorScheme.onSurface
     val finalTint = if (tint != Color.Unspecified) tint else defaultColor
+    val interactionSource = remember { MutableInteractionSource() }
+    val isPressed by interactionSource.collectIsPressedAsState()
+    val scale by animateFloatAsState(
+        targetValue = if (isPressed) 0.88f else 1f,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessMediumLow
+        ),
+        label = "miuixDockActionScale"
+    )
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
+            .graphicsLayer {
+                scaleX = scale
+                scaleY = scale
+            }
             .clip(RoundedCornerShape(12.dp))
-            .clickable(onClick = onClick)
+            .clickable(
+                interactionSource = interactionSource,
+                indication = null,
+                onClick = onClick
+            )
             .padding(horizontal = 8.dp, vertical = 6.dp)
     ) {
         Icon(
